@@ -4,6 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Form Cập Nhật Nhân Viên</title>
+
   <style>
     body{font-family:Arial;background:#f4f4f4;padding:20px;}
     .wrap{
@@ -78,15 +79,18 @@
 
 
 <script>
-// ====== DÁN URL APPS SCRIPT TẠI ĐÂY ======
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMsCKh8vJBXwTJ04rjKq0-qZRK5FTqG7NTsPmkZG_U3_ZEqk4yi0bgtef87_8T7WzY5g/exec";
+// ====== URL Apps Script của bạn ======
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLlKoX7PqA6EZnIw3kCBFrxgJwADo52zBhG3LX_ifook2Mmc4AIjLGJ_OyzLiPp7pLKg/exec";
 
+// Xử lý submit form
 document.getElementById("nvForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
   const msg = document.getElementById("msg");
   msg.textContent = "";
+  msg.className = "";
 
-  const data = {
+  // Gom dữ liệu
+  const payloadObj = {
     HoTen: HoTen.value,
     MaNV: MaNV.value,
     BoPhan: BoPhan.value,
@@ -100,23 +104,28 @@ document.getElementById("nvForm").addEventListener("submit", async (e)=>{
     GhiChu: GhiChu.value
   };
 
+  // Chuyển sang dạng x-www-form-urlencoded (tránh preflight)
+  const body = new URLSearchParams(payloadObj).toString();
+
   try{
     const res = await fetch(SCRIPT_URL,{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(data)
+      headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},
+      body: body
     });
 
     const rs = await res.json();
+
     if(rs.ok){
       msg.textContent = "✔ Gửi thành công!";
       msg.className = "success";
       nvForm.reset();
     } else {
-      msg.textContent = "❌ Lỗi: " + rs.error;
+      msg.textContent = "❌ Lỗi server: " + rs.error;
       msg.className = "error";
     }
-  }catch(e){
+
+  } catch(err){
     msg.textContent = "❌ Không thể kết nối server!";
     msg.className = "error";
   }
@@ -125,4 +134,3 @@ document.getElementById("nvForm").addEventListener("submit", async (e)=>{
 
 </body>
 </html>
-

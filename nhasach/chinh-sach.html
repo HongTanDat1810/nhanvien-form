@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chính sách &amp; hỗ trợ — {TEN}</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="policy">
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="crumb"><a href="index.html">Trang chủ</a> / <span id="crumbNow">Chính sách</span></div>
+
+  <div class="layout">
+    <aside>
+      <div class="filter policy-nav" id="policyNav"></div>
+    </aside>
+    <section class="panel prose" id="policyBody"></section>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+window.PAGE_INIT = function () {
+  var C = window.CFG, F = window.fmtVND;
+
+  var TOPICS = [
+    { k: 'mua-hang', t: 'Hướng dẫn mua hàng', html:
+      '<h2>Hướng dẫn mua hàng</h2>' +
+      '<ol>' +
+      '<li>Tìm sản phẩm bằng ô tìm kiếm ở đầu trang hoặc duyệt theo danh mục.</li>' +
+      '<li>Mở trang sản phẩm, chọn số lượng rồi bấm <b>Thêm vào giỏ</b> (hoặc <b>Mua ngay</b> để sang thẳng giỏ hàng).</li>' +
+      '<li>Vào <a href="gio-hang.html">giỏ hàng</a>, kiểm tra lại số lượng và nhập mã giảm giá nếu có.</li>' +
+      '<li>Điền thông tin giao hàng, chọn phương thức thanh toán rồi bấm <b>Đặt hàng</b>.</li>' +
+      '<li>Nhân viên sẽ gọi xác nhận trong vòng 30 phút (giờ làm việc: ' + C.workingHours + ').</li>' +
+      '</ol>' +
+      '<h3>Mua số lượng lớn</h3>' +
+      '<p>Với đơn hàng sỉ, trường học hoặc doanh nghiệp, vui lòng gọi <b>' + C.hotline + '</b> hoặc gửi email tới <b>' + C.email + '</b> để nhận báo giá riêng.</p>' },
+
+    { k: 'thanh-toan', t: 'Phương thức thanh toán', html:
+      '<h2>Phương thức thanh toán</h2>' +
+      '<ul>' +
+      '<li><b>COD</b> — thanh toán tiền mặt khi nhận hàng, áp dụng toàn quốc.</li>' +
+      '<li><b>VNPAY / thẻ ATM nội địa</b> — chuyển tới cổng thanh toán an toàn của ngân hàng.</li>' +
+      '<li><b>Ví MoMo, ZaloPay</b> — quét mã QR hoặc thanh toán trong ứng dụng.</li>' +
+      '<li><b>Thẻ quốc tế</b> — Visa, Mastercard, JCB.</li>' +
+      '<li><b>Chuyển khoản</b> — vào tài khoản công ty, đơn được xử lý sau khi tiền về.</li>' +
+      '</ul>' +
+      '<p>' + C.name + ' không lưu thông tin thẻ của khách hàng. Mọi giao dịch thẻ đều do đối tác cổng thanh toán xử lý.</p>' +
+      '<h3>Hoá đơn</h3>' +
+      '<p>Cần hoá đơn VAT, vui lòng ghi thông tin xuất hoá đơn vào ô <i>Ghi chú</i> khi đặt hàng.</p>' },
+
+    { k: 'giao-hang', t: 'Chính sách giao hàng', html:
+      '<h2>Chính sách giao hàng</h2>' +
+      '<ul>' +
+      '<li>Miễn phí giao hàng cho đơn từ <b>' + F(C.freeShipThreshold) + '</b>; dưới mức này phí cố định <b>' + F(C.shipFee) + '</b>.</li>' +
+      '<li>Nội thành TP.HCM và Hà Nội: 1–2 ngày làm việc.</li>' +
+      '<li>Các tỉnh thành khác: 2–5 ngày làm việc.</li>' +
+      '<li>Vùng sâu, hải đảo: có thể thêm 1–3 ngày, nhân viên sẽ báo trước khi giao.</li>' +
+      '<li>Có thể chọn nhận tại nhà sách gần nhất, miễn phí hoàn toàn.</li>' +
+      '</ul>' +
+      '<h3>Kiểm tra hàng khi nhận</h3>' +
+      '<p>Khách hàng được đồng kiểm ngoại quan (đúng đầu sách, số lượng, tình trạng bao bì) trước khi thanh toán cho shipper.</p>' },
+
+    { k: 'doi-tra', t: 'Chính sách đổi trả', html:
+      '<h2>Chính sách đổi trả</h2>' +
+      '<h3>Trường hợp được đổi trả</h3>' +
+      '<ul>' +
+      '<li>Sách lỗi in, mất trang, ngược trang, nhoè mực.</li>' +
+      '<li>Sản phẩm bị rách, móp, ướt do quá trình vận chuyển.</li>' +
+      '<li>Giao sai sản phẩm hoặc thiếu so với đơn đặt.</li>' +
+      '</ul>' +
+      '<h3>Điều kiện</h3>' +
+      '<ul>' +
+      '<li>Trong vòng <b>30 ngày</b> kể từ ngày nhận hàng.</li>' +
+      '<li>Sản phẩm còn nguyên tem, chưa qua sử dụng, kèm hoá đơn hoặc mã đơn hàng.</li>' +
+      '<li>Có ảnh chụp lỗi gửi kèm khi yêu cầu đổi trả online.</li>' +
+      '</ul>' +
+      '<h3>Cách thực hiện</h3>' +
+      '<p>Gọi <b>' + C.hotline + '</b> hoặc gửi email <b>' + C.email + '</b> kèm mã đơn hàng. ' +
+      C.name + ' chịu chi phí thu hồi với lỗi từ phía nhà sách và hoàn tiền trong 3–7 ngày làm việc.</p>' },
+
+    { k: 'bao-mat', t: 'Chính sách bảo mật', html:
+      '<h2>Chính sách bảo mật</h2>' +
+      '<h3>Thông tin thu thập</h3>' +
+      '<p>Chỉ thu thập thông tin cần thiết để xử lý đơn hàng: họ tên, số điện thoại, email và địa chỉ nhận hàng.</p>' +
+      '<h3>Mục đích sử dụng</h3>' +
+      '<ul>' +
+      '<li>Xác nhận, đóng gói và giao đơn hàng.</li>' +
+      '<li>Hỗ trợ khách hàng, xử lý đổi trả và bảo hành.</li>' +
+      '<li>Gửi thông tin khuyến mãi khi khách hàng chủ động đăng ký nhận tin.</li>' +
+      '</ul>' +
+      '<h3>Chia sẻ thông tin</h3>' +
+      '<p>Thông tin chỉ được chia sẻ cho đơn vị vận chuyển và cổng thanh toán ở mức tối thiểu để hoàn tất đơn hàng, ' +
+      'ngoài ra không cung cấp cho bên thứ ba vì mục đích thương mại.</p>' +
+      '<h3>Quyền của khách hàng</h3>' +
+      '<p>Khách hàng có thể yêu cầu xem, chỉnh sửa hoặc xoá thông tin cá nhân bằng cách liên hệ <b>' + C.email + '</b>.</p>' },
+
+    { k: 'faq', t: 'Câu hỏi thường gặp', html:
+      '<h2>Câu hỏi thường gặp</h2>' +
+      [
+        ['Tôi có thể đặt hàng mà không cần tài khoản không?',
+         'Có. Bạn chỉ cần điền thông tin giao hàng ở trang giỏ hàng. Tạo tài khoản giúp lưu địa chỉ và tích điểm thành viên.'],
+        ['Làm sao biết đơn hàng đang ở đâu?',
+         'Dùng mục <a href="tai-khoan.html?tab=tracuu">Tra cứu đơn hàng</a> với mã đơn và số điện thoại đã đặt, hoặc gọi hotline.'],
+        ['Mã giảm giá dùng thế nào?',
+         'Nhập mã ở ô "Nhập mã giảm giá" trong trang giỏ hàng rồi bấm Áp dụng. Mỗi đơn hàng dùng được một mã.'],
+        ['Sách có được bọc kỹ khi giao không?',
+         'Sách được bọc màng co và chèn giấy chống sốc, đóng trong hộp carton với đơn nhiều cuốn.'],
+        ['Có xuất hoá đơn VAT không?',
+         'Có. Vui lòng ghi thông tin xuất hoá đơn vào ô Ghi chú khi đặt hàng.'],
+        ['Tôi muốn mua sỉ cho trường học thì liên hệ ai?',
+         'Gọi hotline ' + C.hotline + ' hoặc gửi email tới ' + C.email + ' để được báo giá riêng.']
+      ].map(function (q) {
+        return '<details class="faq-item"><summary>' + q[0] + '</summary><div>' + q[1] + '</div></details>';
+      }).join('') }
+  ];
+
+  var key = new URLSearchParams(location.search).get('t') || 'mua-hang';
+  var cur = TOPICS.filter(function (x) { return x.k === key; })[0] || TOPICS[0];
+
+  document.getElementById('policyNav').innerHTML =
+    '<h4>Hỗ trợ khách hàng</h4>' + TOPICS.map(function (x) {
+      return '<a class="' + (x.k === cur.k ? 'active' : '') + '" href="chinh-sach.html?t=' + x.k + '">' + x.t + '</a>';
+    }).join('');
+
+  document.getElementById('policyBody').innerHTML = cur.html +
+    '<hr style="border:none;border-top:1px solid var(--line);margin:22px 0">' +
+    '<p class="note">Còn thắc mắc? Gọi <b>' + C.hotline + '</b> · ' + C.workingHours +
+    ' hoặc <a href="lien-he.html">gửi liên hệ</a>.</p>';
+
+  document.getElementById('crumbNow').textContent = cur.t;
+  document.title = cur.t + ' — ' + C.name;
+};
+</script>
+</body>
+</html>

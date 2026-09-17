@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tài khoản — {TEN}</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="account">
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="crumb"><a href="index.html">Trang chủ</a> / Tài khoản</div>
+
+  <div class="layout" style="grid-template-columns:1fr 380px;align-items:start">
+    <section class="panel">
+      <div class="auth-tabs">
+        <button class="tab active" data-tab="dangnhap">Đăng nhập</button>
+        <button class="tab" data-tab="dangky">Đăng ký</button>
+        <button class="tab" data-tab="tracuu">Tra cứu đơn hàng</button>
+      </div>
+
+      <form id="form-dangnhap" class="auth-pane">
+        <h2 style="font-size:18px;margin:0 0 12px">Đăng nhập tài khoản</h2>
+        <div class="field"><label>Email hoặc số điện thoại *</label><input required></div>
+        <div class="field"><label>Mật khẩu *</label><input type="password" required minlength="6"></div>
+        <label class="note" style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <input type="checkbox" checked style="width:auto"> Ghi nhớ đăng nhập
+        </label>
+        <button class="btn btn-block">Đăng nhập</button>
+        <p class="note" style="margin-top:10px">Quên mật khẩu? Gọi hotline <b id="hl1"></b> để được hỗ trợ.</p>
+      </form>
+
+      <form id="form-dangky" class="auth-pane hide">
+        <h2 style="font-size:18px;margin:0 0 12px">Tạo tài khoản mới</h2>
+        <div class="field"><label>Họ và tên *</label><input required></div>
+        <div class="field"><label>Số điện thoại *</label><input required pattern="[0-9 +]{9,15}"></div>
+        <div class="field"><label>Email *</label><input type="email" required></div>
+        <div class="field"><label>Mật khẩu *</label><input type="password" required minlength="6"></div>
+        <label class="note" style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px">
+          <input type="checkbox" required style="width:auto;margin-top:3px">
+          <span>Tôi đồng ý với <a href="chinh-sach.html?t=bao-mat">chính sách bảo mật</a> và điều khoản sử dụng.</span>
+        </label>
+        <button class="btn btn-block">Đăng ký</button>
+      </form>
+
+      <form id="form-tracuu" class="auth-pane hide">
+        <h2 style="font-size:18px;margin:0 0 12px">Tra cứu đơn hàng</h2>
+        <div class="field"><label>Mã đơn hàng *</label><input id="orderCode" required placeholder="VD: #A1B2C3"></div>
+        <div class="field"><label>Số điện thoại đặt hàng *</label><input required pattern="[0-9 +]{9,15}"></div>
+        <button class="btn btn-block">Tra cứu</button>
+        <div id="orderResult" style="margin-top:14px"></div>
+      </form>
+    </section>
+
+    <aside>
+      <div class="panel" style="margin-bottom:14px">
+        <h3 style="margin:0 0 10px;font-size:16px">Quyền lợi thành viên</h3>
+        <ul style="margin:0;padding-left:18px;line-height:2;font-size:14px">
+          <li>Tích điểm trên mọi đơn hàng, đổi quà không giới hạn thời gian</li>
+          <li id="memberNote">Giảm thêm cho thành viên</li>
+          <li>Ưu đãi sinh nhật giảm thêm 10%</li>
+          <li>Nhận thông báo sớm về hội sách và sách mới</li>
+          <li>Lưu địa chỉ giao hàng, đặt lại đơn cũ nhanh hơn</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3 style="margin:0 0 10px;font-size:16px">Cần hỗ trợ?</h3>
+        <p class="note" id="supportBox"></p>
+        <a class="btn btn-ghost btn-block" href="lien-he.html">Gửi liên hệ</a>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+window.PAGE_INIT = function () {
+  var C = window.CFG;
+  document.getElementById('hl1').textContent = C.hotline;
+  document.getElementById('memberNote').textContent = C.memberDiscountNote;
+  document.getElementById('supportBox').innerHTML =
+    '📞 ' + C.hotline + '<br>✉️ ' + C.email + '<br>🕗 ' + C.workingHours;
+
+  function show(name) {
+    document.querySelectorAll('.auth-pane').forEach(function (f) { f.classList.add('hide'); });
+    document.getElementById('form-' + name).classList.remove('hide');
+    document.querySelectorAll('.auth-tabs .tab').forEach(function (t) {
+      t.classList.toggle('active', t.dataset.tab === name);
+    });
+  }
+  document.querySelectorAll('.auth-tabs .tab').forEach(function (t) {
+    t.onclick = function () { show(t.dataset.tab); };
+  });
+  var tab = new URLSearchParams(location.search).get('tab');
+  if (tab && document.getElementById('form-' + tab)) show(tab);
+
+  document.getElementById('form-dangnhap').onsubmit = function (e) {
+    e.preventDefault(); window.toast('Bản demo: chưa kết nối hệ thống tài khoản');
+  };
+  document.getElementById('form-dangky').onsubmit = function (e) {
+    e.preventDefault(); e.target.reset(); window.toast('Đăng ký thành công (demo) ✓');
+  };
+  document.getElementById('form-tracuu').onsubmit = function (e) {
+    e.preventDefault();
+    var code = document.getElementById('orderCode').value.trim().toUpperCase().replace(/^#/, '');
+    document.getElementById('orderResult').innerHTML =
+      '<div class="coupon-ok" style="display:block">' +
+      '<b>Đơn hàng #' + (code || 'A1B2C3') + '</b><br>' +
+      'Trạng thái: <b>Đang giao</b> · Dự kiến nhận trong 2 ngày tới.<br>' +
+      '<span class="note">Đây là kết quả mẫu của bản demo, chưa nối với hệ thống thật.</span></div>';
+  };
+};
+</script>
+</body>
+</html>

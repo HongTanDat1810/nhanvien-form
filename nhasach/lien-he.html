@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Liên hệ &amp; hệ thống nhà sách — {TEN}</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="contact">
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="crumb"><a href="index.html">Trang chủ</a> / Liên hệ</div>
+
+  <div class="layout" style="grid-template-columns:1fr 360px">
+    <section>
+      <div class="panel" style="margin-bottom:16px">
+        <h1 style="font-size:22px;margin:0 0 6px" id="aboutTitle"></h1>
+        <p id="aboutText"></p>
+        <div class="trust" style="margin-top:14px">
+          <div><i>🏬</i><b id="storeCount"></b><span>trên toàn quốc</span></div>
+          <div><i>📚</i><b>50.000+</b><span>đầu sách các loại</span></div>
+          <div><i>👥</i><b>1 triệu+</b><span>khách hàng thành viên</span></div>
+          <div><i>🚚</i><b>63/63</b><span>tỉnh thành được giao</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 style="font-size:18px;margin:0 0 12px">Hệ thống nhà sách</h2>
+        <div class="store-grid" id="stores"></div>
+      </div>
+    </section>
+
+    <aside>
+      <form class="panel" id="contactForm" style="margin-bottom:14px">
+        <h2 style="font-size:18px;margin:0 0 10px">Gửi liên hệ</h2>
+        <div class="field"><label>Họ và tên *</label><input required></div>
+        <div class="field"><label>Email *</label><input type="email" required></div>
+        <div class="field"><label>Số điện thoại</label><input></div>
+        <div class="field"><label>Chủ đề</label><select>
+          <option>Tư vấn sản phẩm</option><option>Tra cứu đơn hàng</option>
+          <option>Đổi trả - bảo hành</option><option>Hợp tác - bán sỉ</option><option>Khác</option>
+        </select></div>
+        <div class="field"><label>Nội dung *</label><textarea rows="4" required></textarea></div>
+        <button class="btn btn-block">Gửi liên hệ</button>
+        <p class="note" style="margin-top:8px">Website demo — biểu mẫu không gửi dữ liệu đi đâu.</p>
+      </form>
+
+      <div class="panel" id="infoBox"></div>
+    </aside>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+window.PAGE_INIT = function () {
+  var C = window.CFG;
+  document.getElementById('aboutTitle').textContent = 'Về ' + C.name;
+  document.getElementById('aboutText').innerHTML =
+    '<b>' + C.company + '</b> là hệ thống nhà sách kết hợp bán lẻ trực tuyến, cung cấp sách trong nước, ' +
+    'sách ngoại văn, văn phòng phẩm, dụng cụ học sinh và quà lưu niệm. ' + C.tagline + '. ' +
+    'Chúng tôi hợp tác trực tiếp với các nhà xuất bản và đơn vị phát hành để đảm bảo sách chính hãng, giá tốt và nguồn hàng ổn định.';
+  document.getElementById('storeCount').textContent = window.STORES.length + ' nhà sách';
+
+  document.getElementById('stores').innerHTML = window.STORES.map(function (s) {
+    return '<div class="store"><b>' + s.name + '</b><p>📍 ' + s.addr + '</p><p>📞 ' + s.phone + '</p>' +
+      '<p>🕗 ' + C.workingHours + '</p></div>';
+  }).join('');
+
+  document.getElementById('infoBox').innerHTML =
+    '<h2 style="font-size:18px;margin:0 0 10px">Thông tin liên hệ</h2>' +
+    '<p>🏢 <b>' + C.company + '</b></p>' +
+    '<p>📍 ' + C.address + '</p>' +
+    '<p>📞 Hotline: <b>' + C.hotline + '</b></p>' +
+    '<p>✉️ ' + C.email + '</p>' +
+    '<p>🕗 ' + C.workingHours + '</p>' +
+    '<p class="note">' + C.license + '<br>Mã số thuế: ' + C.taxCode + '</p>';
+
+  document.getElementById('contactForm').onsubmit = function (e) {
+    e.preventDefault(); e.target.reset();
+    window.toast('Đã gửi liên hệ, chúng tôi sẽ phản hồi sớm ✓');
+  };
+};
+</script>
+</body>
+</html>

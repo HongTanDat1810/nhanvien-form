@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Giỏ hàng &amp; thanh toán — {TEN}</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="cart">
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="crumb"><a href="index.html">Trang chủ</a> / Giỏ hàng</div>
+  <h1 style="font-size:22px;margin:0 0 14px">Giỏ hàng của bạn</h1>
+  <div id="cartWrap"></div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+window.PAGE_INIT = function () {
+  var C = window.CFG, F = window.fmtVND;
+
+  function render() {
+    var items = window.Cart.get().filter(function (i) { return window.bookById(i.id); });
+    var wrap = document.getElementById('cartWrap');
+
+    if (!items.length) {
+      wrap.innerHTML = '<div class="empty"><h3>Giỏ hàng đang trống</h3>' +
+        '<p>Hãy chọn vài cuốn sách yêu thích và quay lại nhé.</p>' +
+        '<a class="btn" href="danh-muc.html">Tiếp tục mua sắm</a></div>';
+      return;
+    }
+
+    var sub = window.Cart.subtotal();
+    var coupon = window.Coupon.get();
+    if (coupon && sub < (coupon.min || 0)) coupon = null;   // chưa đủ điều kiện thì bỏ qua
+    var discount = window.Coupon.discount(coupon, sub);
+    var ship = (sub - discount) >= C.freeShipThreshold ? 0 : C.shipFee;
+    if (coupon && coupon.type === 'ship') ship = 0;
+    var rows = items.map(function (it) {
+      var b = window.bookById(it.id);
+      return '<tr>' +
+        '<td><div class="cart-item"><img class="cover" src="' + window.coverOf(b) + '" alt="">' +
+        '<div><a href="san-pham.html?id=' + b.id + '"><b>' + b.title + '</b></a>' +
+        '<div class="note">' + b.author + ' · ' + window.catName(b.cat) + '</div></div></div></td>' +
+        '<td>' + F(b.price) + '</td>' +
+        '<td><div class="qty"><button data-dec="' + b.id + '">−</button>' +
+        '<input value="' + it.qty + '" data-qty="' + b.id + '"><button data-inc="' + b.id + '">+</button></div></td>' +
+        '<td><b style="color:var(--danger)">' + F(b.price * it.qty) + '</b></td>' +
+        '<td><button class="btn btn-ghost btn-sm" data-del="' + b.id + '">Xoá</button></td>' +
+        '</tr>';
+    }).join('');
+
+    wrap.innerHTML =
+      '<div class="layout" style="grid-template-columns:1fr 340px">' +
+        '<div class="panel">' +
+          '<table class="cart-table"><thead><tr>' +
+          '<th>Sản phẩm</th><th>Đơn giá</th><th>Số lượng</th><th>Thành tiền</th><th></th>' +
+          '</tr></thead><tbody>' + rows + '</tbody></table>' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap">' +
+          '<a class="btn btn-ghost" href="danh-muc.html">← Tiếp tục mua sắm</a>' +
+          '<button class="btn btn-ghost" id="clearCart">Xoá toàn bộ giỏ</button></div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="panel" style="margin-bottom:14px">' +
+            '<h3 style="margin:0 0 10px;font-size:16px">Tóm tắt đơn hàng</h3>' +
+            '<div class="sum-row"><span>Tạm tính</span><span>' + F(sub) + '</span></div>' +
+            (discount ? '<div class="sum-row"><span>Giảm giá (' + coupon.code + ')</span>' +
+              '<span style="color:var(--ok)">−' + F(discount) + '</span></div>' : '') +
+            '<div class="sum-row"><span>Phí giao hàng</span><span>' + (ship ? F(ship) : 'Miễn phí') + '</span></div>' +
+            (ship ? '<p class="note">Mua thêm ' + F(C.freeShipThreshold - (sub - discount)) + ' để được miễn phí giao hàng.</p>' : '') +
+            '<div class="sum-row total"><span>Tổng cộng</span><span>' + F(sub - discount + ship) + '</span></div>' +
+            couponBox(coupon, sub) +
+          '</div>' +
+          '<form class="panel" id="orderForm">' +
+            '<h3 style="margin:0 0 10px;font-size:16px">Thông tin giao hàng</h3>' +
+            '<div class="field"><label>Họ và tên *</label><input required></div>' +
+            '<div class="field"><label>Số điện thoại *</label><input required pattern="[0-9 +]{9,15}"></div>' +
+            '<div class="field"><label>Email</label><input type="email"></div>' +
+            '<div class="field"><label>Địa chỉ nhận hàng *</label><textarea rows="2" required></textarea></div>' +
+            '<div class="field"><label>Phương thức thanh toán</label><select>' +
+              '<option>Thanh toán khi nhận hàng (COD)</option><option>VNPAY / Thẻ ngân hàng</option>' +
+              '<option>Ví MoMo</option><option>ZaloPay</option></select></div>' +
+            '<div class="field"><label>Ghi chú</label><textarea rows="2" placeholder="Giao giờ hành chính, gọi trước khi giao..."></textarea></div>' +
+            '<button class="btn btn-accent btn-block">Đặt hàng · ' + F(sub - discount + ship) + '</button>' +
+            '<p class="note" style="margin-top:8px">Đây là website demo — đơn hàng không được gửi đi đâu cả.</p>' +
+          '</form>' +
+        '</div>' +
+      '</div>';
+
+    wrap.querySelectorAll('[data-inc]').forEach(function (b) {
+      b.onclick = function () { change(b.dataset.inc, 1); };
+    });
+    wrap.querySelectorAll('[data-dec]').forEach(function (b) {
+      b.onclick = function () { change(b.dataset.dec, -1); };
+    });
+    wrap.querySelectorAll('[data-qty]').forEach(function (i) {
+      i.onchange = function () { setQty(i.dataset.qty, Math.max(1, parseInt(i.value, 10) || 1)); };
+    });
+    wrap.querySelectorAll('[data-del]').forEach(function (b) {
+      b.onclick = function () {
+        window.Cart.set(window.Cart.get().filter(function (x) { return x.id !== b.dataset.del; }));
+        window.toast('Đã xoá khỏi giỏ hàng'); render();
+      };
+    });
+    bindCoupon(sub);
+    document.getElementById('clearCart').onclick = function () {
+      if (confirm('Xoá toàn bộ sản phẩm trong giỏ?')) { window.Cart.set([]); render(); }
+    };
+    document.getElementById('orderForm').onsubmit = function (e) {
+      e.preventDefault();
+      window.Cart.set([]);
+      window.Coupon.set(null);
+      document.getElementById('cartWrap').innerHTML =
+        '<div class="empty"><h3 style="color:var(--ok)">✔ Đặt hàng thành công!</h3>' +
+        '<p>Mã đơn hàng của bạn: <b>#' + Math.random().toString(36).slice(2, 8).toUpperCase() + '</b><br>' +
+        'Nhân viên ' + C.name + ' sẽ gọi xác nhận trong vòng 30 phút.</p>' +
+        '<a class="btn" href="index.html">Về trang chủ</a></div>';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  }
+
+  function couponBox(coupon, sub) {
+    if (coupon) {
+      return '<div class="coupon-ok" style="margin-top:10px">' +
+        '<span>✔ Đã áp dụng <b>' + coupon.code + '</b> — ' + coupon.label + '</span>' +
+        '<button type="button" id="couponRemove">Bỏ</button></div>';
+    }
+    return '<div class="coupon-row">' +
+        '<input id="couponInput" placeholder="Nhập mã giảm giá">' +
+        '<button class="btn btn-sm" type="button" id="couponApply">Áp dụng</button>' +
+      '</div>' +
+      '<div class="coupon-list">Mã đang có: ' + (C.coupons || []).map(function (c) {
+        return '<code data-code="' + c.code + '" title="Bấm để điền">' + c.code + '</code>' +
+          (sub < (c.min || 0) ? ' <span style="color:var(--danger)">(cần đơn từ ' + F(c.min) + ')</span>' : '');
+      }).join(' · ') + '</div>';
+  }
+
+  function bindCoupon(sub) {
+    var apply = document.getElementById('couponApply');
+    if (apply) {
+      apply.onclick = function () {
+        var code = document.getElementById('couponInput').value;
+        var c = window.Coupon.find(code);
+        if (!c) { window.toast('Mã giảm giá không hợp lệ'); return; }
+        if (sub < (c.min || 0)) { window.toast('Đơn hàng cần tối thiểu ' + F(c.min) + ' để dùng mã này'); return; }
+        window.Coupon.set(c.code); window.toast('Đã áp dụng mã ' + c.code + ' ✓'); render();
+      };
+      document.querySelectorAll('.coupon-list code').forEach(function (el) {
+        el.onclick = function () { document.getElementById('couponInput').value = el.dataset.code; };
+      });
+    }
+    var rm = document.getElementById('couponRemove');
+    if (rm) rm.onclick = function () { window.Coupon.set(null); window.toast('Đã bỏ mã giảm giá'); render(); };
+  }
+
+  function change(id, d) {
+    var c = window.Cart.get();
+    c.forEach(function (x) { if (x.id === id) x.qty = Math.max(1, x.qty + d); });
+    window.Cart.set(c); render();
+  }
+  function setQty(id, v) {
+    var c = window.Cart.get();
+    c.forEach(function (x) { if (x.id === id) x.qty = v; });
+    window.Cart.set(c); render();
+  }
+
+  render();
+};
+</script>
+</body>
+</html>

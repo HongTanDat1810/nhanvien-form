@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chi tiết sản phẩm — {TEN}</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="detail">
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="crumb" id="crumb"></div>
+  <div id="detailWrap"></div>
+
+  <section class="section">
+    <div class="sec-head"><h2>Sản phẩm liên quan</h2></div>
+    <div class="grid" id="related"></div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+window.PAGE_INIT = function () {
+  var id = new URLSearchParams(location.search).get('id');
+  var b = window.bookById(id) || window.BOOKS[0];
+  var C = window.CFG, F = window.fmtVND;
+  var isTool = window.catGroup(b.cat) === 'dungcu';
+  var L = isTool
+    ? { who: 'Thương hiệu', pub: 'Nhà cung cấp', year: 'Năm sản xuất', tab: 'Mô tả sản phẩm' }
+    : { who: 'Tác giả',     pub: 'Nhà xuất bản', year: 'Năm xuất bản', tab: 'Giới thiệu sách' };
+
+  document.title = b.title + ' — ' + C.name;
+  document.getElementById('crumb').innerHTML =
+    '<a href="index.html">Trang chủ</a> / <a href="danh-muc.html?cat=' + b.cat + '">' + window.catName(b.cat) + '</a> / ' + b.title;
+
+  var ship = b.price >= C.freeShipThreshold
+    ? '<span style="color:var(--ok)">✔ Miễn phí giao hàng cho đơn này</span>'
+    : 'Phí giao hàng ' + F(C.shipFee) + ' — miễn phí cho đơn từ ' + F(C.freeShipThreshold);
+
+  /* --- Đánh giá: vài đánh giá mẫu + đánh giá người dùng tự gửi --- */
+  function sampleReviews(bk) {
+    var names = ['Nguyễn Minh Anh', 'Trần Quốc Bảo', 'Lê Thu Hà', 'Phạm Gia Huy',
+                 'Võ Ngọc Linh', 'Đặng Hoài Nam', 'Bùi Khánh Vy', 'Hoàng Tuấn Kiệt'];
+    var texts = [
+      'Sách in đẹp, giấy dày, đóng gói cẩn thận. Giao hàng nhanh hơn dự kiến.',
+      'Nội dung hay, đúng như mô tả. Giá ở đây tốt hơn nhiều nơi khác.',
+      'Mua tặng bạn, được khen nhiều. Sẽ tiếp tục ủng hộ nhà sách.',
+      'Chất lượng ổn so với giá tiền, bìa hơi cấn nhẹ một góc nhưng không đáng kể.',
+      'Đóng gói chắc chắn, có màng co. Nhân viên gọi xác nhận lịch sự.',
+      'Đọc rất cuốn, phù hợp cho người mới bắt đầu tìm hiểu chủ đề này.'
+    ];
+    var h = 0, i;
+    for (i = 0; i < bk.id.length; i++) h = (h * 33 + bk.id.charCodeAt(i)) >>> 0;
+    var n = 3 + (h % 3), out = [];
+    for (i = 0; i < n; i++) {
+      var k = (h + i * 7) % names.length;
+      out.push({
+        name: names[k],
+        rate: i === n - 1 && bk.rate < 4.7 ? 4 : 5,
+        date: (5 + ((h + i * 3) % 23)) + '/0' + (1 + ((h + i) % 9)) + '/2026',
+        text: texts[(h + i * 5) % texts.length]
+      });
+    }
+    return out;
+  }
+  var reviews = window.Reviews.of(b.id).concat(sampleReviews(b));
+
+  function reviewBlock() {
+    var avg = reviews.reduce(function (s2, r) { return s2 + r.rate; }, 0) / reviews.length;
+    var dist = [0, 0, 0, 0, 0];
+    reviews.forEach(function (r) { dist[r.rate - 1]++; });
+    var bars = '';
+    for (var st = 5; st >= 1; st--) {
+      var pc = Math.round(dist[st - 1] / reviews.length * 100);
+      bars += '<div class="rv-bar"><span>' + st + ' ★</span><i><b style="width:' + pc + '%"></b></i>' +
+        '<span>' + dist[st - 1] + '</span></div>';
+    }
+    return '<div class="rv-summary">' +
+        '<div class="rv-score"><b>' + avg.toFixed(1) + '</b>' +
+        '<div class="stars">' + window.starsOf(avg) + '</div>' +
+        '<div class="note">' + reviews.length + ' đánh giá</div></div>' +
+        '<div class="rv-bars">' + bars + '</div>' +
+      '</div>' +
+      '<div id="rvList">' + reviews.map(function (r) {
+        return '<div class="rv-item"><div class="rv-head"><b>' + r.name + '</b>' +
+          '<span class="stars">' + window.starsOf(r.rate) + '</span>' +
+          '<span class="note">' + r.date + '</span></div><p>' + r.text + '</p></div>';
+      }).join('') + '</div>' +
+      '<form id="rvForm" style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px">' +
+        '<h3 style="font-size:16px;margin:0 0 10px">Viết đánh giá của bạn</h3>' +
+        '<div class="field"><label>Số sao</label>' +
+        '<div class="star-pick" id="starPick">' +
+        '12345'.split('').map(function (_, i2) {
+          return '<span data-s="' + (i2 + 1) + '" class="' + (i2 < 5 ? 'on' : '') + '">★</span>';
+        }).join('') + '</div></div>' +
+        '<div class="field"><label>Họ tên *</label><input id="rvName" required></div>' +
+        '<div class="field"><label>Nhận xét *</label><textarea id="rvText" rows="3" required></textarea></div>' +
+        '<button class="btn">Gửi đánh giá</button>' +
+        '<p class="note" style="margin-top:8px">Đánh giá được lưu trong trình duyệt của bạn (bản demo).</p>' +
+      '</form>';
+  }
+
+  document.getElementById('detailWrap').innerHTML =
+    '<div class="panel detail">' +
+      '<div>' +
+        '<img class="cover" src="' + window.coverOf(b) + '" alt="' + b.title + '">' +
+        '<div style="display:flex;gap:8px;margin-top:10px">' +
+          '<span class="off-tag" style="margin:0">Còn hàng</span>' +
+          '<span class="note">Giao từ kho TP.HCM</span>' +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<h1>' + b.title + '</h1>' +
+        '<div class="meta-row">' +
+          '<span>' + L.who + ': <b>' + b.author + '</b></span>' +
+          '<span>' + (isTool ? 'Phân phối' : 'NXB') + ': <b>' + b.publisher + '</b></span>' +
+          '<span class="stars">' + window.starsOf(b.rate) + ' <span style="color:#6b7280">(' + b.rate + ')</span></span>' +
+          '<span>Đã bán ' + b.sold.toLocaleString('vi-VN') + '</span>' +
+        '</div>' +
+        '<div class="price-box">' +
+          '<span class="price">' + F(b.price) + '</span>' +
+          (b.off ? '<span class="price-old">' + F(b.listPrice) + '</span><span class="off-tag">-' + b.off + '%</span>' : '') +
+          '<p class="note" style="margin:8px 0 0">' + ship + '</p>' +
+          '<p class="note" style="margin:4px 0 0">🎁 ' + C.memberDiscountNote + '</p>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">' +
+          '<div class="qty"><button id="mi">−</button><input id="qty" value="1"><button id="pl">+</button></div>' +
+          '<button class="btn btn-accent" id="buyNow">Mua ngay</button>' +
+          '<button class="btn btn-ghost" id="addCart">🛒 Thêm vào giỏ</button>' +
+          '<button class="btn btn-ghost" id="wishBtn">' + (window.Wish.has(b.id) ? '♥ Đã thích' : '♡ Yêu thích') + '</button>' +
+        '</div>' +
+        '<p>' + b.desc + '</p>' +
+        '<ul class="note" style="margin:14px 0 0;padding-left:18px;line-height:1.95">' +
+          '<li>🚚 Giao toàn quốc 2–5 ngày làm việc, miễn phí cho đơn từ ' + F(C.freeShipThreshold) + '.</li>' +
+          '<li>🔄 Đổi trả trong 30 ngày nếu ' + (isTool ? 'sản phẩm lỗi kỹ thuật hoặc hư hỏng do vận chuyển' : 'sách lỗi in, rách hoặc thiếu trang') + '.</li>' +
+          '<li>💳 COD, VNPAY, MoMo, ZaloPay, thẻ nội địa và thẻ quốc tế.</li>' +
+          '<li>🏬 Có thể đặt online và nhận tại nhà sách gần nhất.</li>' +
+        '</ul>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="panel section">' +
+      '<div class="dtabs">' +
+        '<button class="dtab active" data-pane="mota">' + L.tab + '</button>' +
+        '<button class="dtab" data-pane="thongso">Thông tin chi tiết</button>' +
+        '<button class="dtab" data-pane="danhgia">Đánh giá (' + reviews.length + ')</button>' +
+        '<button class="dtab" data-pane="chinhsach">Chính sách</button>' +
+      '</div>' +
+
+      '<div class="dpane active prose" id="pane-mota">' +
+        '<p>' + b.desc + '</p>' +
+        (isTool
+          ? '<p><b>' + b.title + '</b> là sản phẩm của thương hiệu ' + b.author +
+            ', do ' + b.publisher + ' phân phối chính hãng. ' + C.name +
+            ' nhập trực tiếp từ nhà phân phối nên hàng có đầy đủ tem nhãn, đóng gói chống va đập khi giao đi.</p>' +
+            '<p>Phù hợp cho học sinh, sinh viên, người đi làm và các trường học mua sắm đầu năm. ' +
+            'Trường học hoặc doanh nghiệp mua số lượng lớn vui lòng liên hệ hotline <b>' + C.hotline + '</b> để nhận báo giá sỉ.</p>'
+          : '<p>Tác phẩm <b>' + b.title + '</b> của ' + b.author + ' do ' + b.publisher +
+            ' ấn hành năm ' + b.year + (b.pages ? ', dày ' + b.pages + ' trang' : '') + '. ' +
+            'Sách được ' + C.name + ' nhập trực tiếp từ nhà xuất bản, đảm bảo hàng chính hãng, ' +
+            'đóng gói kỹ bằng màng co và hộp carton khi giao đi.</p>' +
+            '<p>Đây là lựa chọn phù hợp cho cả bạn đọc cá nhân lẫn nhu cầu mua tặng. ' +
+            'Với đơn hàng số lượng lớn, vui lòng liên hệ hotline <b>' + C.hotline + '</b> để nhận báo giá sỉ.</p>') +
+      '</div>' +
+
+      '<div class="dpane" id="pane-thongso">' +
+        '<table class="spec">' +
+          '<tr><td>Mã sản phẩm</td><td>' + b.id.toUpperCase() + '</td></tr>' +
+          '<tr><td>' + L.who + '</td><td>' + b.author + '</td></tr>' +
+          '<tr><td>' + L.pub + '</td><td>' + b.publisher + '</td></tr>' +
+          '<tr><td>' + L.year + '</td><td>' + b.year + '</td></tr>' +
+          (b.pages ? '<tr><td>Số trang</td><td>' + b.pages + '</td></tr>' : '') +
+          '<tr><td>Danh mục</td><td>' + window.catName(b.cat) + '</td></tr>' +
+          '<tr><td>' + (isTool ? 'Giá niêm yết' : 'Giá bìa') + '</td><td>' + F(b.listPrice) + '</td></tr>' +
+          '<tr><td>Tình trạng</td><td>Còn hàng</td></tr>' +
+        '</table>' +
+      '</div>' +
+
+      '<div class="dpane" id="pane-danhgia">' + reviewBlock() + '</div>' +
+
+      '<div class="dpane prose" id="pane-chinhsach">' +
+        '<h3>Giao hàng</h3>' +
+        '<ul><li>Giao hàng toàn quốc, 2–5 ngày làm việc tuỳ khu vực.</li>' +
+        '<li>Miễn phí giao hàng cho đơn từ ' + F(C.freeShipThreshold) + ', dưới mức này phí là ' + F(C.shipFee) + '.</li>' +
+        '<li>Có thể đặt online rồi nhận tại nhà sách gần nhất.</li></ul>' +
+        '<h3>Đổi trả</h3>' +
+        '<ul><li>Đổi trả trong 30 ngày nếu ' + (isTool ? 'sản phẩm lỗi kỹ thuật, hư hỏng do vận chuyển hoặc giao sai' : 'sách lỗi in, rách, thiếu trang, giao sai') + '.</li>' +
+        '<li>Sản phẩm còn nguyên tem, chưa qua sử dụng và còn hoá đơn.</li></ul>' +
+        '<h3>Thanh toán</h3>' +
+        '<ul><li>COD, VNPAY, MoMo, ZaloPay, thẻ ATM và thẻ quốc tế.</li>' +
+        '<li>' + C.memberDiscountNote + '.</li></ul>' +
+        '<p><a class="sec-more" href="chinh-sach.html?t=doi-tra">Xem chi tiết chính sách →</a></p>' +
+      '</div>' +
+    '</div>';
+
+  var q = document.getElementById('qty');
+  document.getElementById('mi').onclick = function () { q.value = Math.max(1, (+q.value || 1) - 1); };
+  document.getElementById('pl').onclick = function () { q.value = (+q.value || 1) + 1; };
+  document.getElementById('addCart').onclick = function () { window.Cart.add(b.id, +q.value || 1); };
+  document.getElementById('buyNow').onclick = function () {
+    window.Cart.add(b.id, +q.value || 1);
+    setTimeout(function () { location.href = 'gio-hang.html'; }, 250);
+  };
+
+  document.getElementById('wishBtn').onclick = function () {
+    var on = window.Wish.toggle(b.id);
+    this.textContent = on ? '♥ Đã thích' : '♡ Yêu thích';
+  };
+
+  document.querySelectorAll('.dtab').forEach(function (t) {
+    t.onclick = function () {
+      document.querySelectorAll('.dtab').forEach(function (x) { x.classList.remove('active'); });
+      document.querySelectorAll('.dpane').forEach(function (x) { x.classList.remove('active'); });
+      t.classList.add('active');
+      document.getElementById('pane-' + t.dataset.pane).classList.add('active');
+    };
+  });
+
+  var picked = 5;
+  document.querySelectorAll('#starPick span').forEach(function (sp) {
+    sp.onclick = function () {
+      picked = +sp.dataset.s;
+      document.querySelectorAll('#starPick span').forEach(function (x) {
+        x.classList.toggle('on', +x.dataset.s <= picked);
+      });
+    };
+  });
+  document.getElementById('rvForm').onsubmit = function (e) {
+    e.preventDefault();
+    var name = document.getElementById('rvName').value.trim();
+    var text = document.getElementById('rvText').value.trim();
+    var d = new Date();
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    window.Reviews.add(b.id, {
+      name: name, rate: picked, text: text,
+      date: pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear()
+    });
+    window.toast('Cảm ơn bạn đã đánh giá ✓');
+    setTimeout(function () { location.reload(); }, 600);
+  };
+
+  var rel = window.BOOKS.filter(function (x) { return x.cat === b.cat && x.id !== b.id; }).slice(0, 5);
+  if (rel.length < 5) rel = rel.concat(window.BOOKS.filter(function (x) { return x.cat !== b.cat; }).slice(0, 5 - rel.length));
+  document.getElementById('related').innerHTML = rel.map(window.cardHTML).join('');
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{TEN} — Nhà sách trực tuyến | Sách, văn phòng phẩm, quà tặng</title>
+<meta name="description" content="Mua sách trong nước, sách ngoại văn, văn phòng phẩm và quà lưu niệm. Giao hàng toàn quốc, giảm giá đến 50%.">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a4ea3'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+</head>
+<body data-page="home">
+<div id="site-header"></div>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="cat-box">
+      <h3>☰ Danh mục sản phẩm</h3>
+      <div id="heroCats"></div>
+    </div>
+    <div class="slider" id="slider"></div>
+    <div class="side-promos" id="sidePromos"></div>
+  </section>
+
+  <!-- CAM KẾT -->
+  <section class="trust">
+    <div><i>🚚</i><b>Miễn phí giao hàng</b><span id="trustShip">Cho đơn từ 300.000đ</span></div>
+    <div><i>🔄</i><b>Đổi trả trong 30 ngày</b><span>Sách lỗi in, rách, thiếu trang</span></div>
+    <div><i>✅</i><b>Hàng chính hãng 100%</b><span>Trực tiếp từ NXB &amp; nhà phân phối</span></div>
+    <div><i>🎁</i><b>Tích điểm thành viên</b><span id="trustMember">Giảm thêm 5% mỗi đơn</span></div>
+  </section>
+
+  <!-- DANH MỤC NỔI BẬT -->
+  <section class="section">
+    <div class="sec-head"><h2>Danh mục nổi bật</h2><a class="sec-more" href="danh-muc.html">Xem tất cả →</a></div>
+    <div class="cat-grid" id="catGrid"></div>
+  </section>
+
+  <!-- FLASH SALE -->
+  <section class="section flash">
+    <div class="flash-head">
+      <h2>⚡ Flash Sale hôm nay</h2>
+      <div class="countdown">Kết thúc sau <b id="cdH">00</b>:<b id="cdM">00</b>:<b id="cdS">00</b></div>
+      <a class="btn btn-ghost btn-sm" href="danh-muc.html?tag=hot">Xem tất cả</a>
+    </div>
+    <div class="grid" id="flashGrid"></div>
+  </section>
+
+  <!-- SÁCH MỚI / BÁN CHẠY -->
+  <section class="section">
+    <div class="sec-head">
+      <h2>Sách nổi bật</h2>
+      <div class="tabs">
+        <button class="tab active" data-tab="moi">Mới phát hành</button>
+        <button class="tab" data-tab="banchay">Bán chạy</button>
+        <button class="tab" data-tab="giamgia">Giảm giá sốc</button>
+      </div>
+    </div>
+    <div class="grid" id="featGrid"></div>
+  </section>
+
+  <!-- BANNER ĐÔI -->
+  <section class="section" style="display:grid;grid-template-columns:1fr 1fr;gap:14px" id="dualBanner"></section>
+
+  <!-- THEO DANH MỤC -->
+  <section class="section">
+    <div class="sec-head"><h2>Sách thiếu nhi</h2><a class="sec-more" href="danh-muc.html?cat=thieu-nhi">Xem tất cả →</a></div>
+    <div class="grid" id="gridThieuNhi"></div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2>Dụng cụ học tập</h2><a class="sec-more" href="danh-muc.html?cat=dung-cu">Xem tất cả →</a></div>
+    <div class="grid" id="gridDungCu"></div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2>Dụng cụ mỹ thuật &amp; văn phòng phẩm</h2><a class="sec-more" href="danh-muc.html?nhom=dungcu">Xem tất cả →</a></div>
+    <div class="grid" id="gridVPP"></div>
+  </section>
+
+  <!-- TIN TỨC -->
+  <section class="section">
+    <div class="sec-head"><h2>Tin tức &amp; sự kiện</h2><a class="sec-more" href="tin-tuc.html">Xem tất cả →</a></div>
+    <div class="news-grid" id="newsGrid"></div>
+  </section>
+
+  <!-- HỆ THỐNG CỬA HÀNG -->
+  <section class="section panel">
+    <div class="sec-head"><h2>Hệ thống nhà sách</h2><a class="sec-more" href="lien-he.html">Xem bản đồ →</a></div>
+    <div class="store-grid" id="storeGrid"></div>
+  </section>
+
+  <!-- ĐĂNG KÝ NHẬN TIN -->
+  <section class="section newsletter">
+    <div><h2>Đăng ký nhận bản tin</h2><p>Sách mới, lịch hội sách và mã giảm giá gửi tới email mỗi tuần.</p></div>
+    <form class="nl-form" data-newsletter>
+      <input type="email" placeholder="Nhập email của bạn" required>
+      <button class="btn btn-accent">Đăng ký</button>
+    </form>
+  </section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+window.PAGE_INIT = function () {
+  var C = window.CFG, B = window.BOOKS;
+
+  document.getElementById('trustShip').textContent = 'Cho đơn từ ' + window.fmtVND(C.freeShipThreshold);
+  document.getElementById('trustMember').textContent = C.memberDiscountNote;
+
+  /* Danh mục cột trái + lưới danh mục */
+  document.getElementById('heroCats').innerHTML = window.CATEGORIES.map(function (c) {
+    return '<a href="danh-muc.html?cat=' + c.slug + '"><span>' + c.icon + '</span>' + c.name + '</a>';
+  }).join('');
+  document.getElementById('catGrid').innerHTML = window.CATEGORIES.map(function (c) {
+    return '<a class="cat-chip" href="danh-muc.html?cat=' + c.slug + '"><i>' + c.icon + '</i>' + c.name + '</a>';
+  }).join('');
+
+  /* Slider */
+  var sl = document.getElementById('slider');
+  sl.innerHTML = window.BANNERS.map(function (b, i) {
+    return '<div class="slide' + (i ? '' : ' active') + '" style="background:linear-gradient(120deg,' + b.c1 + ',' + b.c2 + ')">' +
+      '<h2>' + b.title + '</h2><p>' + b.sub + '</p>' +
+      '<a class="btn btn-accent" href="' + b.href + '" style="align-self:flex-start">' + b.cta + '</a></div>';
+  }).join('') + '<div class="slide-dots">' + window.BANNERS.map(function (_, i) {
+    return '<i class="' + (i ? '' : 'active') + '" data-i="' + i + '"></i>';
+  }).join('') + '</div>';
+  var cur = 0, slides = sl.querySelectorAll('.slide'), dots = sl.querySelectorAll('.slide-dots i');
+  function go(n) {
+    slides[cur].classList.remove('active'); dots[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active'); dots[cur].classList.add('active');
+  }
+  dots.forEach(function (d) { d.onclick = function () { go(+d.dataset.i); }; });
+  setInterval(function () { go(cur + 1); }, 5000);
+
+  document.getElementById('sidePromos').innerHTML =
+    '<a class="promo" href="danh-muc.html?cat=my-thuat" style="background:linear-gradient(135deg,#6a1b9a,#b06ab3)">' +
+    '<b>Dụng cụ mỹ thuật</b><span>Màu vẽ, cọ, canvas — giảm đến 30%</span></a>' +
+    '<a class="promo" href="danh-muc.html?cat=ngoai-van" style="background:linear-gradient(135deg,#00875a,#4ec98a)">' +
+    '<b>Sách ngoại văn</b><span>Nhập khẩu chính hãng</span></a>' +
+    '<a class="promo" href="lien-he.html" style="background:linear-gradient(135deg,#1a3a5c,#3d7ea6)">' +
+    '<b>Thẻ thành viên</b><span>Tích điểm — đổi quà</span></a>';
+
+  /* Flash sale + đồng hồ đếm ngược tới 24h */
+  var flash = B.slice().sort(function (a, b) { return b.off - a.off; }).slice(0, 5);
+  document.getElementById('flashGrid').innerHTML = flash.map(window.cardHTML).join('');
+  setInterval(function () {
+    var now = new Date(), end = new Date(); end.setHours(23, 59, 59, 999);
+    var d = Math.max(0, Math.floor((end - now) / 1000));
+    var p = function (n) { return String(n).padStart(2, '0'); };
+    document.getElementById('cdH').textContent = p(Math.floor(d / 3600));
+    document.getElementById('cdM').textContent = p(Math.floor(d % 3600 / 60));
+    document.getElementById('cdS').textContent = p(d % 60);
+  }, 1000);
+
+  /* Tabs sách nổi bật */
+  function feat(kind) {
+    var list;
+    if (kind === 'moi') list = B.filter(function (b) { return b.tags.indexOf('moi') > -1 || b.year >= 2025; });
+    else if (kind === 'banchay') list = B.slice().sort(function (a, b) { return b.sold - a.sold; });
+    else list = B.slice().sort(function (a, b) { return (b.listPrice - b.price) - (a.listPrice - a.price); });
+    document.getElementById('featGrid').innerHTML = list.slice(0, 10).map(window.cardHTML).join('');
+  }
+  feat('moi');
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.onclick = function () {
+      document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('active'); });
+      t.classList.add('active'); feat(t.dataset.tab);
+    };
+  });
+
+  document.getElementById('dualBanner').innerHTML =
+    '<a class="promo" href="danh-muc.html?cat=van-hoc" style="min-height:130px;background:linear-gradient(120deg,#c0392b,#e8743b)">' +
+    '<b style="font-size:20px">Tuần lễ văn học kinh điển</b><span>Mua 3 giảm thêm 10% — Freeship toàn quốc</span></a>' +
+    '<a class="promo" href="danh-muc.html?nhom=dungcu" style="min-height:130px;background:linear-gradient(120deg,#0a4ea3,#00b2c9)">' +
+    '<b style="font-size:20px">Mùa tựu trường</b><span>Sách giáo khoa, ba lô, bút thước &amp; màu vẽ — đủ bộ trong một đơn</span></a>';
+
+  var pick = function (slug, n) { return B.filter(function (b) { return b.cat === slug; }).slice(0, n).map(window.cardHTML).join(''); };
+  document.getElementById('gridThieuNhi').innerHTML = pick('thieu-nhi', 5);
+  document.getElementById('gridDungCu').innerHTML = pick('dung-cu', 5);
+  document.getElementById('gridVPP').innerHTML = B.filter(function (b) {
+    return b.cat === 'my-thuat' || b.cat === 'vpp';
+  }).slice(0, 5).map(window.cardHTML).join('');
+
+  var col = ['#0a4ea3', '#c0392b', '#00875a'];
+  document.getElementById('newsGrid').innerHTML = window.NEWS.slice(0, 3).map(function (n, i) {
+    return '<a class="news-card" href="tin-tuc.html?id=' + n.id + '">' +
+      '<div class="news-thumb" style="background:' + col[i % 3] + '">📰</div>' +
+      '<div class="news-body"><span class="news-meta">' + n.cat + ' · ' + n.date + '</span>' +
+      '<h3>' + n.title + '</h3><p>' + n.excerpt + '</p>' +
+      '<span class="sec-more">Đọc tiếp →</span></div></a>';
+  }).join('');
+
+  document.getElementById('storeGrid').innerHTML = window.STORES.map(function (s) {
+    return '<div class="store"><b>' + s.name + '</b><p>📍 ' + s.addr + '</p><p>📞 ' + s.phone + '</p></div>';
+  }).join('');
+};
+</script>
+</body>
+</html>

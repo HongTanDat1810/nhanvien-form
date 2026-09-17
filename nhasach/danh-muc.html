@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Danh mục sản phẩm — {TEN}</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="list">
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="crumb"><a href="index.html">Trang chủ</a> / <span id="crumbNow">Danh mục</span></div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="filter">
+        <h4>Danh mục</h4>
+        <div id="fCats"></div>
+      </div>
+      <div class="filter">
+        <h4>Khoảng giá</h4>
+        <div id="fPrice"></div>
+      </div>
+      <div class="filter">
+        <h4>Khuyến mãi</h4>
+        <label><input type="checkbox" id="fSale"> Đang giảm giá (≥ 20%)</label>
+        <label><input type="checkbox" id="fNew"> Sách mới phát hành</label>
+        <label><input type="checkbox" id="fHot"> Bán chạy / HOT</label>
+      </div>
+      <button class="btn btn-ghost btn-block" id="fClear">Xoá bộ lọc</button>
+    </aside>
+
+    <section>
+      <h1 id="pageTitle" style="font-size:22px;margin:0 0 12px"></h1>
+      <div class="toolbar">
+        <span id="countInfo" class="note"></span>
+        <label class="note">Sắp xếp:
+          <select id="sortSel">
+            <option value="pop">Phổ biến nhất</option>
+            <option value="new">Mới nhất</option>
+            <option value="asc">Giá thấp → cao</option>
+            <option value="desc">Giá cao → thấp</option>
+            <option value="off">Giảm giá nhiều nhất</option>
+            <option value="rate">Đánh giá cao</option>
+          </select>
+        </label>
+      </div>
+      <div class="grid grid-4" id="listGrid"></div>
+      <div class="pager" id="pager"></div>
+    </section>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+window.PAGE_INIT = function () {
+  var params = new URLSearchParams(location.search);
+  var state = {
+    cat: params.get('cat') || '',
+    sub: params.get('sub') || '',
+    q: (params.get('q') || '').toLowerCase(),
+    tag: params.get('tag') || '',
+    price: '', sale: false, isNew: false, hot: false,
+    sort: 'pop', page: 1, per: 12
+  };
+  if (state.tag === 'hot') state.hot = true;
+
+  var PRICES = [
+    { v: '', t: 'Tất cả' },
+    { v: '0-100000', t: 'Dưới 100.000đ' },
+    { v: '100000-200000', t: '100.000đ - 200.000đ' },
+    { v: '200000-500000', t: '200.000đ - 500.000đ' },
+    { v: '500000-99999999', t: 'Trên 500.000đ' }
+  ];
+
+  document.getElementById('fCats').innerHTML =
+    '<label><input type="radio" name="fc" value="" ' + (state.cat ? '' : 'checked') + '> Tất cả sản phẩm</label>' +
+    window.CATEGORIES.map(function (c) {
+      return '<label><input type="radio" name="fc" value="' + c.slug + '"' + (state.cat === c.slug ? ' checked' : '') + '> ' + c.icon + ' ' + c.name + '</label>';
+    }).join('');
+  document.getElementById('fPrice').innerHTML = PRICES.map(function (p, i) {
+    return '<label><input type="radio" name="fp" value="' + p.v + '"' + (i ? '' : ' checked') + '> ' + p.t + '</label>';
+  }).join('');
+
+  function bind() {
+    document.querySelectorAll('input[name=fc]').forEach(function (r) {
+      r.onchange = function () { state.cat = r.value; state.sub = ''; state.page = 1; render(); };
+    });
+    document.querySelectorAll('input[name=fp]').forEach(function (r) {
+      r.onchange = function () { state.price = r.value; state.page = 1; render(); };
+    });
+    document.getElementById('fSale').onchange = function () { state.sale = this.checked; state.page = 1; render(); };
+    document.getElementById('fNew').onchange = function () { state.isNew = this.checked; state.page = 1; render(); };
+    document.getElementById('fHot').onchange = function () { state.hot = this.checked; state.page = 1; render(); };
+    document.getElementById('fHot').checked = state.hot;
+    document.getElementById('sortSel').onchange = function () { state.sort = this.value; state.page = 1; render(); };
+    document.getElementById('fClear').onclick = function () { location.href = 'danh-muc.html'; };
+  }
+
+  function filtered() {
+    var list = window.BOOKS.slice();
+    if (state.cat) list = list.filter(function (b) { return b.cat === state.cat; });
+    if (state.q) list = list.filter(function (b) {
+      return (b.title + ' ' + b.author + ' ' + b.publisher).toLowerCase().indexOf(state.q) > -1;
+    });
+    if (state.price) {
+      var p = state.price.split('-');
+      list = list.filter(function (b) { return b.price >= +p[0] && b.price <= +p[1]; });
+    }
+    if (state.sale) list = list.filter(function (b) { return b.off >= 20; });
+    if (state.isNew) list = list.filter(function (b) { return b.tags.indexOf('moi') > -1 || b.year >= 2025; });
+    if (state.hot) list = list.filter(function (b) { return b.tags.indexOf('hot') > -1 || b.tags.indexOf('banchay') > -1; });
+
+    var s = state.sort;
+    list.sort(function (a, b) {
+      if (s === 'asc') return a.price - b.price;
+      if (s === 'desc') return b.price - a.price;
+      if (s === 'off') return b.off - a.off;
+      if (s === 'rate') return b.rate - a.rate;
+      if (s === 'new') return b.year - a.year;
+      return b.sold - a.sold;
+    });
+    return list;
+  }
+
+  function render() {
+    var title = state.q ? 'Kết quả tìm kiếm: "' + state.q + '"'
+      : state.sub ? state.sub
+      : state.cat ? window.catName(state.cat)
+      : state.tag === 'hot' ? 'Khuyến mãi &amp; bán chạy' : 'Tất cả sản phẩm';
+    document.getElementById('pageTitle').innerHTML = title;
+    document.getElementById('crumbNow').innerHTML = title;
+
+    var list = filtered();
+    var pages = Math.max(1, Math.ceil(list.length / state.per));
+    if (state.page > pages) state.page = pages;
+    var slice = list.slice((state.page - 1) * state.per, state.page * state.per);
+
+    document.getElementById('countInfo').textContent = 'Tìm thấy ' + list.length + ' sản phẩm';
+    document.getElementById('listGrid').innerHTML = slice.length
+      ? slice.map(window.cardHTML).join('')
+      : '';
+    document.getElementById('listGrid').className = slice.length ? 'grid grid-4' : '';
+    if (!slice.length) {
+      document.getElementById('listGrid').innerHTML =
+        '<div class="empty"><h3>Không tìm thấy sản phẩm phù hợp</h3>' +
+        '<p>Thử bỏ bớt bộ lọc hoặc tìm với từ khoá khác.</p>' +
+        '<a class="btn" href="danh-muc.html">Xem tất cả sản phẩm</a></div>';
+    }
+
+    var pg = '';
+    if (pages > 1) {
+      pg += '<button ' + (state.page === 1 ? 'disabled' : '') + ' data-p="' + (state.page - 1) + '">‹</button>';
+      for (var i = 1; i <= pages; i++) pg += '<button class="' + (i === state.page ? 'active' : '') + '" data-p="' + i + '">' + i + '</button>';
+      pg += '<button ' + (state.page === pages ? 'disabled' : '') + ' data-p="' + (state.page + 1) + '">›</button>';
+    }
+    document.getElementById('pager').innerHTML = pg;
+    document.querySelectorAll('#pager button[data-p]').forEach(function (b) {
+      b.onclick = function () { state.page = +b.dataset.p; render(); window.scrollTo({ top: 120, behavior: 'smooth' }); };
+    });
+  }
+
+  bind(); render();
+};
+</script>
+</body>
+</html>

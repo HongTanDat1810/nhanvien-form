@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chi tiết sản phẩm — {TEN}</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="detail">
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="crumb" id="crumb"></div>
+  <div id="detailWrap"></div>
+
+  <section class="section">
+    <div class="sec-head"><h2>Sản phẩm liên quan</h2></div>
+    <div class="grid" id="related"></div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+window.PAGE_INIT = function () {
+  var id = new URLSearchParams(location.search).get('id');
+  var b = window.bookById(id) || window.BOOKS[0];
+  var C = window.CFG, F = window.fmtVND;
+
+  document.title = b.title + ' — ' + C.name;
+  document.getElementById('crumb').innerHTML =
+    '<a href="index.html">Trang chủ</a> / <a href="danh-muc.html?cat=' + b.cat + '">' + window.catName(b.cat) + '</a> / ' + b.title;
+
+  var ship = b.price >= C.freeShipThreshold
+    ? '<span style="color:var(--ok)">✔ Miễn phí giao hàng cho đơn này</span>'
+    : 'Phí giao hàng ' + F(C.shipFee) + ' — miễn phí cho đơn từ ' + F(C.freeShipThreshold);
+
+  document.getElementById('detailWrap').innerHTML =
+    '<div class="panel detail">' +
+      '<div>' +
+        '<img class="cover" src="' + window.coverOf(b) + '" alt="' + b.title + '">' +
+        '<div style="display:flex;gap:8px;margin-top:10px">' +
+          '<span class="off-tag" style="margin:0">Còn hàng</span>' +
+          '<span class="note">Giao từ kho TP.HCM</span>' +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<h1>' + b.title + '</h1>' +
+        '<div class="meta-row">' +
+          '<span>Tác giả: <b>' + b.author + '</b></span>' +
+          '<span>NXB: <b>' + b.publisher + '</b></span>' +
+          '<span class="stars">' + window.starsOf(b.rate) + ' <span style="color:#6b7280">(' + b.rate + ')</span></span>' +
+          '<span>Đã bán ' + b.sold.toLocaleString('vi-VN') + '</span>' +
+        '</div>' +
+        '<div class="price-box">' +
+          '<span class="price">' + F(b.price) + '</span>' +
+          (b.off ? '<span class="price-old">' + F(b.listPrice) + '</span><span class="off-tag">-' + b.off + '%</span>' : '') +
+          '<p class="note" style="margin:8px 0 0">' + ship + '</p>' +
+          '<p class="note" style="margin:4px 0 0">🎁 ' + C.memberDiscountNote + '</p>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">' +
+          '<div class="qty"><button id="mi">−</button><input id="qty" value="1"><button id="pl">+</button></div>' +
+          '<button class="btn btn-accent" id="buyNow">Mua ngay</button>' +
+          '<button class="btn btn-ghost" id="addCart">🛒 Thêm vào giỏ</button>' +
+        '</div>' +
+        '<p>' + b.desc + '</p>' +
+        '<h3 style="font-size:16px;margin:18px 0 8px">Thông tin chi tiết</h3>' +
+        '<table class="spec">' +
+          '<tr><td>Mã sản phẩm</td><td>' + b.id.toUpperCase() + '</td></tr>' +
+          '<tr><td>Tác giả</td><td>' + b.author + '</td></tr>' +
+          '<tr><td>Nhà xuất bản</td><td>' + b.publisher + '</td></tr>' +
+          '<tr><td>Năm xuất bản</td><td>' + b.year + '</td></tr>' +
+          (b.pages ? '<tr><td>Số trang</td><td>' + b.pages + '</td></tr>' : '') +
+          '<tr><td>Danh mục</td><td>' + window.catName(b.cat) + '</td></tr>' +
+          '<tr><td>Giá bìa</td><td>' + F(b.listPrice) + '</td></tr>' +
+        '</table>' +
+        '<h3 style="font-size:16px;margin:18px 0 8px">Chính sách</h3>' +
+        '<ul class="note" style="margin:0;padding-left:18px;line-height:1.9">' +
+          '<li>Đổi trả trong 30 ngày nếu sách lỗi in, rách, thiếu trang.</li>' +
+          '<li>Thanh toán khi nhận hàng (COD), VNPAY, MoMo, ZaloPay, thẻ quốc tế.</li>' +
+          '<li>Giao hàng toàn quốc 2–5 ngày làm việc.</li>' +
+        '</ul>' +
+      '</div>' +
+    '</div>';
+
+  var q = document.getElementById('qty');
+  document.getElementById('mi').onclick = function () { q.value = Math.max(1, (+q.value || 1) - 1); };
+  document.getElementById('pl').onclick = function () { q.value = (+q.value || 1) + 1; };
+  document.getElementById('addCart').onclick = function () { window.Cart.add(b.id, +q.value || 1); };
+  document.getElementById('buyNow').onclick = function () {
+    window.Cart.add(b.id, +q.value || 1);
+    setTimeout(function () { location.href = 'gio-hang.html'; }, 250);
+  };
+
+  var rel = window.BOOKS.filter(function (x) { return x.cat === b.cat && x.id !== b.id; }).slice(0, 5);
+  if (rel.length < 5) rel = rel.concat(window.BOOKS.filter(function (x) { return x.cat !== b.cat; }).slice(0, 5 - rel.length));
+  document.getElementById('related').innerHTML = rel.map(window.cardHTML).join('');
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tin tức &amp; sự kiện — {TEN}</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="news">
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="crumb" id="crumb"><a href="index.html">Trang chủ</a> / Tin tức</div>
+  <div id="newsWrap"></div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+window.PAGE_INIT = function () {
+  var id = new URLSearchParams(location.search).get('id');
+  var col = ['#0a4ea3', '#c0392b', '#00875a', '#6a1b9a', '#ef6c00', '#00838f'];
+  var wrap = document.getElementById('newsWrap');
+
+  if (id) {
+    var n = window.NEWS.filter(function (x) { return x.id === id; })[0] || window.NEWS[0];
+    document.title = n.title + ' — ' + window.CFG.name;
+    document.getElementById('crumb').innerHTML =
+      '<a href="index.html">Trang chủ</a> / <a href="tin-tuc.html">Tin tức</a> / ' + n.title;
+    wrap.innerHTML =
+      '<div class="layout" style="grid-template-columns:1fr 320px">' +
+        '<article class="panel">' +
+          '<h1 style="margin:0 0 6px;font-size:25px;line-height:1.3">' + n.title + '</h1>' +
+          '<p class="note">' + n.cat + ' · ' + n.date + ' · ' + window.CFG.name + '</p>' +
+          '<div style="height:200px;border-radius:8px;background:' + col[window.NEWS.indexOf(n) % 6] + ';display:grid;place-items:center;font-size:56px;color:#fff;margin:14px 0">📰</div>' +
+          '<p><b>' + n.excerpt + '</b></p>' +
+          '<p>Chương trình được triển khai đồng thời tại toàn bộ hệ thống nhà sách ' + window.CFG.name +
+          ' và trên website. Bạn đọc có thể đặt hàng trực tuyến rồi nhận tại cửa hàng gần nhất, hoặc chọn giao tận nhà với thời gian 2–5 ngày làm việc.</p>' +
+          '<p>Bên cạnh ưu đãi về giá, ' + window.CFG.name + ' còn tổ chức nhiều hoạt động bên lề: giao lưu tác giả, ' +
+          'workshop làm sổ tay thủ công, góc đọc sách miễn phí cho thiếu nhi và chương trình quyên góp sách cho vùng xa.</p>' +
+          '<p>Thẻ thành viên tiếp tục được áp dụng cùng chương trình khuyến mãi. ' + window.CFG.memberDiscountNote +
+          '. Mọi thắc mắc vui lòng liên hệ hotline <b>' + window.CFG.hotline + '</b> hoặc email <b>' + window.CFG.email + '</b>.</p>' +
+          '<p><a class="btn btn-ghost" href="tin-tuc.html">← Quay lại danh sách tin</a></p>' +
+        '</article>' +
+        '<aside class="panel">' +
+          '<h3 style="margin:0 0 10px;font-size:16px">Tin khác</h3>' +
+          window.NEWS.filter(function (x) { return x.id !== n.id; }).slice(0, 5).map(function (o) {
+            return '<a href="tin-tuc.html?id=' + o.id + '" style="display:block;padding:9px 0;border-bottom:1px solid var(--line)">' +
+              '<b style="font-size:14px">' + o.title + '</b><div class="note">' + o.date + '</div></a>';
+          }).join('') +
+        '</aside>' +
+      '</div>';
+    return;
+  }
+
+  wrap.innerHTML =
+    '<h1 style="font-size:22px;margin:0 0 14px">Tin tức &amp; sự kiện</h1>' +
+    '<div class="news-grid">' + window.NEWS.map(function (n, i) {
+      return '<a class="news-card" href="tin-tuc.html?id=' + n.id + '">' +
+        '<div class="news-thumb" style="background:' + col[i % 6] + '">📰</div>' +
+        '<div class="news-body"><span class="news-meta">' + n.cat + ' · ' + n.date + '</span>' +
+        '<h3>' + n.title + '</h3><p>' + n.excerpt + '</p>' +
+        '<span class="sec-more">Đọc tiếp →</span></div></a>';
+    }).join('') + '</div>';
+};
+</script>
+</body>
+</html>

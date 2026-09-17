@@ -27,7 +27,7 @@
   <section class="trust">
     <div><i>🚚</i><b>Miễn phí giao hàng</b><span id="trustShip">Cho đơn từ 300.000đ</span></div>
     <div><i>🔄</i><b>Đổi trả trong 30 ngày</b><span>Sách lỗi in, rách, thiếu trang</span></div>
-    <div><i>✅</i><b>Sách chính hãng 100%</b><span>Hợp tác trực tiếp với NXB</span></div>
+    <div><i>✅</i><b>Hàng chính hãng 100%</b><span>Trực tiếp từ NXB &amp; nhà phân phối</span></div>
     <div><i>🎁</i><b>Tích điểm thành viên</b><span id="trustMember">Giảm thêm 5% mỗi đơn</span></div>
   </section>
 
@@ -70,7 +70,12 @@
   </section>
 
   <section class="section">
-    <div class="sec-head"><h2>Văn phòng phẩm &amp; quà tặng</h2><a class="sec-more" href="danh-muc.html?cat=vpp">Xem tất cả →</a></div>
+    <div class="sec-head"><h2>Dụng cụ học tập</h2><a class="sec-more" href="danh-muc.html?cat=dung-cu">Xem tất cả →</a></div>
+    <div class="grid" id="gridDungCu"></div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2>Dụng cụ mỹ thuật &amp; văn phòng phẩm</h2><a class="sec-more" href="danh-muc.html?nhom=dungcu">Xem tất cả →</a></div>
     <div class="grid" id="gridVPP"></div>
   </section>
 
@@ -136,8 +141,8 @@ window.PAGE_INIT = function () {
   setInterval(function () { go(cur + 1); }, 5000);
 
   document.getElementById('sidePromos').innerHTML =
-    '<a class="promo" href="danh-muc.html?cat=ngoai-ngu" style="background:linear-gradient(135deg,#6a1b9a,#b06ab3)">' +
-    '<b>Luyện thi IELTS</b><span>Giáo trình bản quyền, giảm 25%</span></a>' +
+    '<a class="promo" href="danh-muc.html?cat=my-thuat" style="background:linear-gradient(135deg,#6a1b9a,#b06ab3)">' +
+    '<b>Dụng cụ mỹ thuật</b><span>Màu vẽ, cọ, canvas — giảm đến 30%</span></a>' +
     '<a class="promo" href="danh-muc.html?cat=ngoai-van" style="background:linear-gradient(135deg,#00875a,#4ec98a)">' +
     '<b>Sách ngoại văn</b><span>Nhập khẩu chính hãng</span></a>' +
     '<a class="promo" href="lien-he.html" style="background:linear-gradient(135deg,#1a3a5c,#3d7ea6)">' +
@@ -174,12 +179,15 @@ window.PAGE_INIT = function () {
   document.getElementById('dualBanner').innerHTML =
     '<a class="promo" href="danh-muc.html?cat=van-hoc" style="min-height:130px;background:linear-gradient(120deg,#c0392b,#e8743b)">' +
     '<b style="font-size:20px">Tuần lễ văn học kinh điển</b><span>Mua 3 giảm thêm 10% — Freeship toàn quốc</span></a>' +
-    '<a class="promo" href="danh-muc.html?cat=giao-khoa" style="min-height:130px;background:linear-gradient(120deg,#0a4ea3,#00b2c9)">' +
-    '<b style="font-size:20px">Mùa tựu trường</b><span>Sách giáo khoa &amp; dụng cụ học tập đủ bộ</span></a>';
+    '<a class="promo" href="danh-muc.html?nhom=dungcu" style="min-height:130px;background:linear-gradient(120deg,#0a4ea3,#00b2c9)">' +
+    '<b style="font-size:20px">Mùa tựu trường</b><span>Sách giáo khoa, ba lô, bút thước &amp; màu vẽ — đủ bộ trong một đơn</span></a>';
 
   var pick = function (slug, n) { return B.filter(function (b) { return b.cat === slug; }).slice(0, n).map(window.cardHTML).join(''); };
   document.getElementById('gridThieuNhi').innerHTML = pick('thieu-nhi', 5);
-  document.getElementById('gridVPP').innerHTML = B.filter(function (b) { return b.cat === 'vpp' || b.cat === 'qua-tang'; }).slice(0, 5).map(window.cardHTML).join('');
+  document.getElementById('gridDungCu').innerHTML = pick('dung-cu', 5);
+  document.getElementById('gridVPP').innerHTML = B.filter(function (b) {
+    return b.cat === 'my-thuat' || b.cat === 'vpp';
+  }).slice(0, 5).map(window.cardHTML).join('');
 
   var col = ['#0a4ea3', '#c0392b', '#00875a'];
   document.getElementById('newsGrid').innerHTML = window.NEWS.slice(0, 3).map(function (n, i) {

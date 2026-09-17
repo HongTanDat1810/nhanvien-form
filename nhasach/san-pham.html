@@ -29,6 +29,10 @@ window.PAGE_INIT = function () {
   var id = new URLSearchParams(location.search).get('id');
   var b = window.bookById(id) || window.BOOKS[0];
   var C = window.CFG, F = window.fmtVND;
+  var isTool = window.catGroup(b.cat) === 'dungcu';
+  var L = isTool
+    ? { who: 'Thương hiệu', pub: 'Nhà cung cấp', year: 'Năm sản xuất', tab: 'Mô tả sản phẩm' }
+    : { who: 'Tác giả',     pub: 'Nhà xuất bản', year: 'Năm xuất bản', tab: 'Giới thiệu sách' };
 
   document.title = b.title + ' — ' + C.name;
   document.getElementById('crumb').innerHTML =
@@ -113,8 +117,8 @@ window.PAGE_INIT = function () {
       '<div>' +
         '<h1>' + b.title + '</h1>' +
         '<div class="meta-row">' +
-          '<span>Tác giả: <b>' + b.author + '</b></span>' +
-          '<span>NXB: <b>' + b.publisher + '</b></span>' +
+          '<span>' + L.who + ': <b>' + b.author + '</b></span>' +
+          '<span>' + (isTool ? 'Phân phối' : 'NXB') + ': <b>' + b.publisher + '</b></span>' +
           '<span class="stars">' + window.starsOf(b.rate) + ' <span style="color:#6b7280">(' + b.rate + ')</span></span>' +
           '<span>Đã bán ' + b.sold.toLocaleString('vi-VN') + '</span>' +
         '</div>' +
@@ -133,7 +137,7 @@ window.PAGE_INIT = function () {
         '<p>' + b.desc + '</p>' +
         '<ul class="note" style="margin:14px 0 0;padding-left:18px;line-height:1.95">' +
           '<li>🚚 Giao toàn quốc 2–5 ngày làm việc, miễn phí cho đơn từ ' + F(C.freeShipThreshold) + '.</li>' +
-          '<li>🔄 Đổi trả trong 30 ngày nếu sách lỗi in, rách hoặc thiếu trang.</li>' +
+          '<li>🔄 Đổi trả trong 30 ngày nếu ' + (isTool ? 'sản phẩm lỗi kỹ thuật hoặc hư hỏng do vận chuyển' : 'sách lỗi in, rách hoặc thiếu trang') + '.</li>' +
           '<li>💳 COD, VNPAY, MoMo, ZaloPay, thẻ nội địa và thẻ quốc tế.</li>' +
           '<li>🏬 Có thể đặt online và nhận tại nhà sách gần nhất.</li>' +
         '</ul>' +
@@ -142,7 +146,7 @@ window.PAGE_INIT = function () {
 
     '<div class="panel section">' +
       '<div class="dtabs">' +
-        '<button class="dtab active" data-pane="mota">Mô tả sản phẩm</button>' +
+        '<button class="dtab active" data-pane="mota">' + L.tab + '</button>' +
         '<button class="dtab" data-pane="thongso">Thông tin chi tiết</button>' +
         '<button class="dtab" data-pane="danhgia">Đánh giá (' + reviews.length + ')</button>' +
         '<button class="dtab" data-pane="chinhsach">Chính sách</button>' +
@@ -150,23 +154,29 @@ window.PAGE_INIT = function () {
 
       '<div class="dpane active prose" id="pane-mota">' +
         '<p>' + b.desc + '</p>' +
-        '<p>Tác phẩm <b>' + b.title + '</b> của ' + b.author + ' do ' + b.publisher +
-        ' ấn hành năm ' + b.year + (b.pages ? ', dày ' + b.pages + ' trang' : '') + '. ' +
-        'Sách được ' + C.name + ' nhập trực tiếp từ nhà xuất bản, đảm bảo hàng chính hãng, ' +
-        'đóng gói kỹ bằng màng co và hộp carton khi giao đi.</p>' +
-        '<p>Đây là lựa chọn phù hợp cho cả bạn đọc cá nhân lẫn nhu cầu mua tặng. ' +
-        'Với đơn hàng số lượng lớn, vui lòng liên hệ hotline <b>' + C.hotline + '</b> để nhận báo giá sỉ.</p>' +
+        (isTool
+          ? '<p><b>' + b.title + '</b> là sản phẩm của thương hiệu ' + b.author +
+            ', do ' + b.publisher + ' phân phối chính hãng. ' + C.name +
+            ' nhập trực tiếp từ nhà phân phối nên hàng có đầy đủ tem nhãn, đóng gói chống va đập khi giao đi.</p>' +
+            '<p>Phù hợp cho học sinh, sinh viên, người đi làm và các trường học mua sắm đầu năm. ' +
+            'Trường học hoặc doanh nghiệp mua số lượng lớn vui lòng liên hệ hotline <b>' + C.hotline + '</b> để nhận báo giá sỉ.</p>'
+          : '<p>Tác phẩm <b>' + b.title + '</b> của ' + b.author + ' do ' + b.publisher +
+            ' ấn hành năm ' + b.year + (b.pages ? ', dày ' + b.pages + ' trang' : '') + '. ' +
+            'Sách được ' + C.name + ' nhập trực tiếp từ nhà xuất bản, đảm bảo hàng chính hãng, ' +
+            'đóng gói kỹ bằng màng co và hộp carton khi giao đi.</p>' +
+            '<p>Đây là lựa chọn phù hợp cho cả bạn đọc cá nhân lẫn nhu cầu mua tặng. ' +
+            'Với đơn hàng số lượng lớn, vui lòng liên hệ hotline <b>' + C.hotline + '</b> để nhận báo giá sỉ.</p>') +
       '</div>' +
 
       '<div class="dpane" id="pane-thongso">' +
         '<table class="spec">' +
           '<tr><td>Mã sản phẩm</td><td>' + b.id.toUpperCase() + '</td></tr>' +
-          '<tr><td>Tác giả</td><td>' + b.author + '</td></tr>' +
-          '<tr><td>Nhà xuất bản</td><td>' + b.publisher + '</td></tr>' +
-          '<tr><td>Năm xuất bản</td><td>' + b.year + '</td></tr>' +
+          '<tr><td>' + L.who + '</td><td>' + b.author + '</td></tr>' +
+          '<tr><td>' + L.pub + '</td><td>' + b.publisher + '</td></tr>' +
+          '<tr><td>' + L.year + '</td><td>' + b.year + '</td></tr>' +
           (b.pages ? '<tr><td>Số trang</td><td>' + b.pages + '</td></tr>' : '') +
           '<tr><td>Danh mục</td><td>' + window.catName(b.cat) + '</td></tr>' +
-          '<tr><td>Giá bìa</td><td>' + F(b.listPrice) + '</td></tr>' +
+          '<tr><td>' + (isTool ? 'Giá niêm yết' : 'Giá bìa') + '</td><td>' + F(b.listPrice) + '</td></tr>' +
           '<tr><td>Tình trạng</td><td>Còn hàng</td></tr>' +
         '</table>' +
       '</div>' +
@@ -179,7 +189,7 @@ window.PAGE_INIT = function () {
         '<li>Miễn phí giao hàng cho đơn từ ' + F(C.freeShipThreshold) + ', dưới mức này phí là ' + F(C.shipFee) + '.</li>' +
         '<li>Có thể đặt online rồi nhận tại nhà sách gần nhất.</li></ul>' +
         '<h3>Đổi trả</h3>' +
-        '<ul><li>Đổi trả trong 30 ngày nếu sách lỗi in, rách, thiếu trang, giao sai.</li>' +
+        '<ul><li>Đổi trả trong 30 ngày nếu ' + (isTool ? 'sản phẩm lỗi kỹ thuật, hư hỏng do vận chuyển hoặc giao sai' : 'sách lỗi in, rách, thiếu trang, giao sai') + '.</li>' +
         '<li>Sản phẩm còn nguyên tem, chưa qua sử dụng và còn hoá đơn.</li></ul>' +
         '<h3>Thanh toán</h3>' +
         '<ul><li>COD, VNPAY, MoMo, ZaloPay, thẻ ATM và thẻ quốc tế.</li>' +

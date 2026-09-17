@@ -176,7 +176,7 @@
       '<button class="wish-btn' + (inWish(b.id) ? ' on' : '') + '" data-wish="' + b.id + '" ' +
       'title="Thêm vào yêu thích" aria-label="Thêm vào yêu thích">♥</button>' +
       '<a class="card-img" href="san-pham.html?id=' + b.id + '">' + badgeOf(b) +
-      '<img class="cover" src="' + cover(b) + '" alt="' + esc(b.title) + '" loading="lazy"></a>' +
+      '<img class="cover" src="' + cover(b) + '" alt="' + esc(b.title) + '"></a>' +
       '<div class="card-body">' +
       '<span class="card-cat">' + esc(catName(b.cat)) + '</span>' +
       '<a class="card-title" href="san-pham.html?id=' + b.id + '">' + esc(b.title) + '</a>' +
@@ -208,12 +208,25 @@
   /* ---------- Header / Nav / Footer ---------- */
   function renderChrome() {
     var cats = window.CATEGORIES;
-    var menu = cats.slice(0, 6).map(function (c) {
+    var books = cats.filter(function (c) { return c.group === 'sach'; });
+    var tools = cats.filter(function (c) { return c.group === 'dungcu'; });
+
+    function subMenu(c) {
+      return c.children.map(function (s) {
+        return '<a href="danh-muc.html?cat=' + c.slug + '&sub=' + encodeURIComponent(s) + '">' + s + '</a>';
+      }).join('');
+    }
+
+    var menu = books.slice(0, 5).map(function (c) {
       return '<div class="nav-item"><a href="danh-muc.html?cat=' + c.slug + '">' + c.name + ' ▾</a>' +
-        '<div class="dropdown">' + c.children.map(function (s) {
-          return '<a href="danh-muc.html?cat=' + c.slug + '&sub=' + encodeURIComponent(s) + '">' + s + '</a>';
-        }).join('') + '</div></div>';
-    }).join('');
+        '<div class="dropdown">' + subMenu(c) + '</div></div>';
+    }).join('') +
+    /* Toàn bộ nhóm dụng cụ gom vào một menu riêng */
+    '<div class="nav-item"><a href="danh-muc.html?nhom=dungcu">📐 Dụng cụ &amp; VPP ▾</a>' +
+      '<div class="dropdown">' + tools.map(function (c) {
+        return '<a href="danh-muc.html?cat=' + c.slug + '"><b>' + c.icon + ' ' + c.name + '</b></a>' +
+          subMenu(c).replace(/<a /g, '<a class="dd-sub" ');
+      }).join('<div class="dd-sep"></div>') + '</div></div>';
 
     var header =
       '<div class="topbar"><div class="wrap">' +
@@ -229,7 +242,7 @@
       '<span class="logo-mark">' + esc(CFG.nameShort.charAt(0) || 'A') + '</span>' +
       '<span class="logo-text"><b>' + esc(CFG.name) + '</b><span>' + esc(CFG.slogan) + '</span></span></a>' +
       '<form class="search" id="searchForm" autocomplete="off">' +
-      '<input id="q" placeholder="Tìm sách, tác giả, văn phòng phẩm..." value="' + esc(qs('q')) + '">' +
+      '<input id="q" placeholder="Tìm sách, dụng cụ học tập, văn phòng phẩm..." value="' + esc(qs('q')) + '">' +
       '<button type="submit">🔍 Tìm</button><div class="suggest hide" id="suggest"></div></form>' +
       '<div class="head-actions">' +
       '<a class="head-act head-phone" href="lien-he.html"><i>📞</i><span><small>Hỗ trợ</small><b>' + esc(CFG.hotline) + '</b></span></a>' +
@@ -242,9 +255,16 @@
 
       '<nav class="nav"><div class="wrap">' +
       '<div class="nav-item all"><a href="danh-muc.html">☰ Danh mục</a>' +
-      '<div class="dropdown">' + cats.map(function (c) {
-        return '<a href="danh-muc.html?cat=' + c.slug + '">' + c.icon + ' ' + c.name + '</a>';
-      }).join('') + '</div></div>' + menu +
+      '<div class="dropdown">' +
+        '<div class="dd-label">Sách</div>' +
+        books.map(function (c) {
+          return '<a href="danh-muc.html?cat=' + c.slug + '">' + c.icon + ' ' + c.name + '</a>';
+        }).join('') +
+        '<div class="dd-label">Dụng cụ &amp; văn phòng phẩm</div>' +
+        tools.map(function (c) {
+          return '<a href="danh-muc.html?cat=' + c.slug + '">' + c.icon + ' ' + c.name + '</a>';
+        }).join('') +
+      '</div></div>' + menu +
       '<div class="nav-item"><a href="danh-muc.html?tag=hot" style="color:var(--accent)">🔥 Khuyến mãi</a></div>' +
       '<div class="nav-item"><a href="tin-tuc.html">Tin tức</a></div>' +
       '</div></nav>';

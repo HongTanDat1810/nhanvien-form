@@ -3,18 +3,28 @@
    Thay bằng dữ liệu thật hoặc nối API khi triển khai.
    ========================================================================= */
 
+/* group: 'sach' = sách · 'dungcu' = dụng cụ, văn phòng phẩm, quà tặng */
 window.CATEGORIES = [
-  { slug: 'van-hoc',      name: 'Văn học',                  icon: '📖', children: ['Tiểu thuyết', 'Truyện ngắn', 'Thơ', 'Light novel'] },
-  { slug: 'kinh-te',      name: 'Kinh tế',                  icon: '📈', children: ['Quản trị - Lãnh đạo', 'Marketing - Bán hàng', 'Tài chính - Đầu tư', 'Khởi nghiệp'] },
-  { slug: 'ky-nang',      name: 'Tâm lý - Kỹ năng sống',    icon: '🧠', children: ['Kỹ năng sống', 'Tâm lý', 'Sách hạt giống tâm hồn', 'Rèn luyện nhân cách'] },
-  { slug: 'thieu-nhi',    name: 'Thiếu nhi',                icon: '🧸', children: ['Truyện tranh', 'Tô màu - Tập vẽ', 'Kiến thức bách khoa', 'Sách cho bé 0-6 tuổi'] },
-  { slug: 'giao-khoa',    name: 'Giáo khoa - Tham khảo',    icon: '🎓', children: ['Sách giáo khoa', 'Sách bài tập', 'Luyện thi', 'Từ điển'] },
-  { slug: 'ngoai-ngu',    name: 'Ngoại ngữ',                icon: '🌏', children: ['Tiếng Anh', 'Tiếng Nhật', 'Tiếng Hàn', 'Tiếng Trung'] },
-  { slug: 'ngoai-van',    name: 'Sách ngoại văn',           icon: '🗽', children: ['Fiction', 'Business', 'Children books', 'Manga - Comic'] },
-  { slug: 'lich-su',      name: 'Lịch sử - Địa lý',         icon: '🏛️', children: ['Lịch sử Việt Nam', 'Lịch sử thế giới', 'Danh nhân', 'Du ký'] },
-  { slug: 'vpp',          name: 'Văn phòng phẩm',           icon: '✏️', children: ['Bút viết', 'Sổ tay - Notebook', 'Dụng cụ học sinh', 'Giấy - Sổ sách'] },
-  { slug: 'qua-tang',     name: 'Quà lưu niệm - Lifestyle', icon: '🎁', children: ['Quà tặng', 'Trang trí', 'Túi vải - Balo', 'Lịch - Thiệp'] }
+  { slug: 'van-hoc',   group: 'sach',   name: 'Văn học',               icon: '📖', children: ['Tiểu thuyết', 'Truyện ngắn', 'Thơ', 'Light novel'] },
+  { slug: 'kinh-te',   group: 'sach',   name: 'Kinh tế',               icon: '📈', children: ['Quản trị - Lãnh đạo', 'Marketing - Bán hàng', 'Tài chính - Đầu tư', 'Khởi nghiệp'] },
+  { slug: 'ky-nang',   group: 'sach',   name: 'Tâm lý - Kỹ năng sống', icon: '🧠', children: ['Kỹ năng sống', 'Tâm lý', 'Sách hạt giống tâm hồn', 'Rèn luyện nhân cách'] },
+  { slug: 'thieu-nhi', group: 'sach',   name: 'Thiếu nhi',             icon: '🧸', children: ['Truyện tranh', 'Tô màu - Tập vẽ', 'Kiến thức bách khoa', 'Sách cho bé 0-6 tuổi'] },
+  { slug: 'giao-khoa', group: 'sach',   name: 'Giáo khoa - Tham khảo', icon: '🎓', children: ['Sách giáo khoa', 'Sách bài tập', 'Luyện thi', 'Từ điển'] },
+  { slug: 'ngoai-ngu', group: 'sach',   name: 'Ngoại ngữ',             icon: '🌏', children: ['Tiếng Anh', 'Tiếng Nhật', 'Tiếng Hàn', 'Tiếng Trung'] },
+  { slug: 'ngoai-van', group: 'sach',   name: 'Sách ngoại văn',        icon: '🗽', children: ['Fiction', 'Business', 'Children books', 'Manga - Comic'] },
+  { slug: 'lich-su',   group: 'sach',   name: 'Lịch sử - Địa lý',      icon: '🏛️', children: ['Lịch sử Việt Nam', 'Lịch sử thế giới', 'Danh nhân', 'Du ký'] },
+
+  { slug: 'dung-cu',   group: 'dungcu', name: 'Dụng cụ học tập',       icon: '📐', children: ['Bút - Thước - Compa', 'Cặp - Ba lô', 'Hộp bút - Bảng viết', 'Máy tính cầm tay'] },
+  { slug: 'my-thuat',  group: 'dungcu', name: 'Dụng cụ mỹ thuật',      icon: '🎨', children: ['Màu vẽ', 'Cọ - Bảng pha màu', 'Giấy vẽ - Canvas', 'Đất nặn - Thủ công'] },
+  { slug: 'vpp',       group: 'dungcu', name: 'Văn phòng phẩm',        icon: '✏️', children: ['Bút viết', 'Sổ tay - Notebook', 'Giấy - Sổ sách', 'Dụng cụ văn phòng'] },
+  { slug: 'qua-tang',  group: 'dungcu', name: 'Quà lưu niệm - Lifestyle', icon: '🎁', children: ['Quà tặng', 'Trang trí', 'Túi vải - Balo', 'Lịch - Thiệp'] }
 ];
+
+/* Nhóm của một danh mục: 'sach' hoặc 'dungcu' */
+window.catGroup = function (slug) {
+  var c = window.CATEGORIES.filter(function (x) { return x.slug === slug; })[0];
+  return c ? c.group : 'sach';
+};
 
 /* id, tên, tác giả, danh mục, giá bìa, % giảm, NXB, năm, số trang, đã bán, đánh giá, nhãn, mô tả */
 function B(id, title, author, cat, list, off, pub, year, pages, sold, rate, tags, desc) {
@@ -24,7 +34,9 @@ function B(id, title, author, cat, list, off, pub, year, pages, sold, rate, tags
     price: Math.round(list * (100 - off) / 100 / 1000) * 1000,
     off, publisher: pub, year, pages, sold, rate,
     tags: tags || [],
-    desc: desc || 'Ấn phẩm được tuyển chọn kỹ lưỡng về nội dung và hình thức, in trên giấy tốt, trình bày trang nhã — món quà ý nghĩa cho người yêu sách.'
+    desc: desc || (window.catGroup(cat) === 'dungcu'
+      ? 'Sản phẩm chính hãng, chất liệu bền, hoàn thiện chắc chắn — phù hợp cho học sinh, sinh viên và dân văn phòng.'
+      : 'Ấn phẩm được tuyển chọn kỹ lưỡng về nội dung và hình thức, in trên giấy tốt, trình bày trang nhã — món quà ý nghĩa cho người yêu sách.')
   };
 }
 
@@ -71,10 +83,33 @@ window.BOOKS = [
   B('ls02', 'Sapiens - Lược Sử Loài Người', 'Yuval Noah Harari', 'lich-su', 289000, 28, 'NXB Tri Thức', 2024, 560, 7800, 4.9, ['banchay', 'hot'], null),
   B('ls03', 'Lịch Sử Sài Gòn - Chợ Lớn', 'Nhiều tác giả', 'lich-su', 245000, 25, 'NXB Tổng Hợp', 2024, 430, 860, 4.6, ['moi'], null),
 
+  B('dc01', 'Bộ Dụng Cụ Học Tập 12 Món (Hộp Nhựa)', 'Deli', 'dung-cu', 165000, 30, 'Deli', 2025, 0, 4200, 4.5, ['banchay'], 'Đủ bút chì, tẩy, gọt, thước kẻ, compa, ê ke — hộp nhựa trong có khoá, gọn trong cặp học sinh.'),
+  B('dc02', 'Bộ Thước Kẻ 4 Món Nhựa Dẻo Không Gãy', 'Thiên Long', 'dung-cu', 38000, 20, 'Thiên Long', 2025, 0, 6800, 4.4, [], 'Thước thẳng 20cm, ê ke, thước đo độ; nhựa dẻo chống gãy, vạch chia in sắc nét không bay màu.'),
+  B('dc03', 'Compa Kim Loại Có Hộp Đựng', 'Deli', 'dung-cu', 72000, 25, 'Deli', 2025, 0, 2900, 4.6, [], 'Thân hợp kim, khớp xoay chắc, vẽ đường tròn đến bán kính 15cm; kèm ruột chì dự phòng.'),
+  B('dc04', 'Bút Chì Gỗ 2B (Hộp 12 Cây)', 'Điểm 10', 'dung-cu', 42000, 15, 'Thiên Long', 2025, 0, 11200, 4.7, ['banchay'], 'Ruột chì 2B đều màu, ít gãy khi gọt; thân gỗ nhẹ, phù hợp tập viết và tô trắc nghiệm.'),
+  B('dc05', 'Ba Lô Chống Gù Chống Thấm Cho Học Sinh', 'Campus', 'dung-cu', 520000, 30, 'Campus', 2025, 0, 1850, 4.8, ['hot'], 'Khung lưng nâng đỡ cột sống, quai bản to có đệm, vải chống thấm, 3 ngăn lớn đựng vừa sách A4.'),
+  B('dc06', 'Cặp Chống Gù Có Bánh Xe Kéo', 'Miti', 'dung-cu', 680000, 25, 'Miti', 2025, 0, 940, 4.5, ['moi'], 'Tay kéo rút và bánh xe êm, chuyển nhanh sang kiểu đeo vai; đáy chống thấm, khoá kéo đôi.'),
+  B('dc07', 'Hộp Bút Vải 2 Ngăn Chống Sốc', 'Colokit', 'dung-cu', 85000, 20, 'Colokit', 2025, 0, 5300, 4.4, [], 'Hai ngăn kéo riêng, lót mút giữ bút không xô lệch, vải canvas dày dễ vệ sinh.'),
+  B('dc08', 'Bảng Viết 2 Mặt Kèm Bút Lông & Khăn Lau', 'Hồng Hà', 'dung-cu', 110000, 25, 'Hồng Hà', 2025, 0, 3100, 4.3, [], 'Một mặt kẻ ô tập viết, một mặt trắng trơn; bề mặt xoá sạch không lưu vết mực.'),
+  B('dc09', 'Máy Tính Khoa Học Casio FX-580VN X', 'Casio', 'dung-cu', 720000, 12, 'Bitex phân phối', 2025, 0, 7400, 4.9, ['banchay', 'hot'], 'Được phép mang vào phòng thi THPT Quốc gia, hơn 500 chức năng, màn hình hiển thị tự nhiên.'),
+  B('dc10', 'Đèn Bàn LED Chống Cận 3 Mức Sáng', 'Rạng Đông', 'dung-cu', 390000, 28, 'Rạng Đông', 2025, 0, 2250, 4.6, ['moi'], 'Ánh sáng không nhấp nháy, 3 mức sáng, thân xoay 180°, có cổng sạc USB cho góc học tập.'),
+
+  B('mt01', 'Màu Nước 24 Ô Kèm Cọ & Khay Pha', 'Marco', 'my-thuat', 210000, 30, 'Marco', 2025, 0, 2600, 4.7, ['banchay'], 'Màu lên tươi, tan đều, không nứt khi khô; hộp thiếc gập lại thành khay pha màu tiện mang theo.'),
+  B('mt02', 'Bút Chì Màu 48 Màu Thân Gỗ', 'Faber-Castell', 'my-thuat', 285000, 25, 'Faber-Castell', 2025, 0, 3400, 4.8, ['hot'], 'Ruột mềm, lên màu mượt và chồng lớp tốt; thân gỗ chuẩn dễ gọt, ít gãy ruột.'),
+  B('mt03', 'Bộ Cọ Vẽ 10 Cây Nhiều Cỡ', 'Mont Marte', 'my-thuat', 175000, 22, 'Mont Marte', 2025, 0, 1780, 4.5, [], 'Đủ cọ tròn, cọ dẹt, cọ quạt cho màu nước và acrylic; lông giữ form, ít rụng khi rửa.'),
+  B('mt04', 'Giấy Vẽ A4 Định Lượng 180gsm (Tập 50 Tờ)', 'Canson', 'my-thuat', 125000, 18, 'Canson', 2025, 0, 4100, 4.6, [], 'Giấy dày ăn màu tốt, không nhăn khi đi màu nước; bề mặt vân nhẹ hợp cả chì và bút kim.'),
+  B('mt05', 'Khung Canvas Vẽ 30x40cm (Combo 3 Tấm)', 'Mont Marte', 'my-thuat', 240000, 25, 'Mont Marte', 2025, 0, 890, 4.4, ['moi'], 'Vải bố căng sẵn trên khung gỗ thông, đã phủ lớp lót gesso, dùng ngay với acrylic hoặc sơn dầu.'),
+  B('mt06', 'Giá Vẽ Gỗ Chữ A Gấp Gọn', 'Mont Marte', 'my-thuat', 450000, 30, 'Mont Marte', 2025, 0, 620, 4.5, [], 'Gỗ thông đánh nhẵn, chỉnh được độ cao và độ nghiêng, gấp gọn khi không dùng.'),
+  B('mt07', 'Đất Nặn An Toàn 12 Màu Cho Bé', 'Colokit', 'my-thuat', 78000, 20, 'Colokit', 2025, 0, 5600, 4.5, ['banchay'], 'Nguyên liệu an toàn cho trẻ, mềm dẻo dễ tạo hình, không dính tay, kèm khuôn và que nặn.'),
+  B('mt08', 'Bộ Bút Lông Màu 36 Màu Hai Đầu', 'Touch', 'my-thuat', 320000, 28, 'Touch', 2025, 0, 1950, 4.6, ['moi'], 'Một đầu cọ mềm, một đầu ngòi tròn; mực gốc cồn lên màu đều, phù hợp vẽ minh hoạ và calligraphy.'),
+
   B('vp01', 'Bút Bi Thiên Long TL-027 (Hộp 20 Cây)', 'Thiên Long', 'vpp', 90000, 15, 'Thiên Long', 2025, 0, 12400, 4.6, ['banchay'], 'Mực đều, nét thanh, thích hợp cho học sinh - văn phòng.'),
   B('vp02', 'Sổ Tay Bìa Da A5 200 Trang', 'Crabit', 'vpp', 125000, 25, 'Crabit', 2024, 200, 3200, 4.5, [], null),
-  B('vp03', 'Bộ Dụng Cụ Học Sinh 12 Món', 'Deli', 'vpp', 165000, 30, 'Deli', 2025, 0, 2800, 4.4, ['moi'], null),
-  B('vp04', 'Giấy Note Dán 5 Màu (Combo 10 Tập)', 'Pronoti', 'vpp', 60000, 20, 'Pronoti', 2024, 0, 5600, 4.3, [], null),
+  B('vp03', 'Giấy Note Dán 5 Màu (Combo 10 Tập)', 'Pronoti', 'vpp', 60000, 20, 'Pronoti', 2024, 0, 5600, 4.3, [], null),
+  B('vp04', 'Giấy In A4 70gsm (Ream 500 Tờ)', 'Double A', 'vpp', 95000, 12, 'Double A', 2025, 0, 8900, 4.7, ['banchay'], 'Giấy trắng đều, ít kẹt máy, chạy tốt trên cả máy in phun và in laser.'),
+  B('vp05', 'Bấm Kim Số 10 Kèm Hộp Ghim', 'Deli', 'vpp', 55000, 20, 'Deli', 2025, 0, 4300, 4.4, [], 'Thân kim loại, bấm nhẹ tay, kẹp được khoảng 20 tờ; kèm sẵn một hộp ghim.'),
+  B('vp06', 'Bìa Còng A4 Gáy 7cm (Combo 3 Cái)', 'Thiên Long', 'vpp', 135000, 22, 'Thiên Long', 2025, 0, 2700, 4.3, [], 'Còng thép bật êm, bìa cứng ép nhựa chống ẩm, có ô dán nhãn ở gáy.'),
+  B('vp07', 'Bút Highlight 6 Màu Pastel', 'Stabilo', 'vpp', 115000, 25, 'Stabilo', 2025, 0, 6200, 4.7, ['banchay'], 'Mực pastel dịu mắt, không lem qua mặt sau giấy, ngòi vát tô được cả nét to và nét nhỏ.'),
 
   B('qt01', 'Lịch Để Bàn 2026 - Danh Lam Việt Nam', 'Nhiều tác giả', 'qua-tang', 135000, 20, 'NXB Văn Hóa', 2025, 60, 1900, 4.5, ['moi'], null),
   B('qt02', 'Túi Vải Canvas In Hình Sách', 'Local Brand', 'qua-tang', 110000, 25, 'Local Brand', 2024, 0, 2400, 4.4, [], null),
@@ -108,5 +143,5 @@ window.STORES = [
 window.BANNERS = [
   { title: 'Hội sách mùa thu', sub: 'Giảm đến 50% hơn 20.000 đầu sách', cta: 'Mua ngay', href: 'danh-muc.html?tag=hot', c1: '#0a4ea3', c2: '#00b2c9' },
   { title: 'Sách thiếu nhi',   sub: 'Mua 2 tặng 1 — Ehon, truyện tranh, bách khoa',      cta: 'Khám phá', href: 'danh-muc.html?cat=thieu-nhi', c1: '#ff6b00', c2: '#ffb300' },
-  { title: 'Back to school',   sub: 'Văn phòng phẩm & dụng cụ học sinh từ 9.000đ',       cta: 'Xem ngay', href: 'danh-muc.html?cat=vpp', c1: '#00875a', c2: '#57d9a3' }
+  { title: 'Back to school',   sub: 'Ba lô chống gù, bút thước, màu vẽ — từ 38.000đ',     cta: 'Xem ngay', href: 'danh-muc.html?nhom=dungcu', c1: '#00875a', c2: '#57d9a3' }
 ];

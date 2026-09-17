@@ -10,8 +10,8 @@ window.SITE_CONFIG = {
   /* --- Tên thương hiệu (đang để tạm là "A") --- */
   name: 'A',
   nameShort: 'A',
-  slogan: 'Nhà sách trực tuyến',
-  tagline: 'Sách hay mỗi ngày — Giao nhanh toàn quốc',
+  slogan: 'Sách & Dụng cụ học tập',
+  tagline: 'Sách hay, dụng cụ đủ — Giao nhanh toàn quốc',
 
   /* --- Thông tin liên hệ --- */
   hotline: '1900 1234',

@@ -66,6 +66,7 @@ window.PAGE_INIT = function () {
     sub: params.get('sub') || '',
     q: (params.get('q') || '').toLowerCase(),
     tag: params.get('tag') || '',
+    nhom: params.get('nhom') || '',
     price: '', sale: false, isNew: false, hot: false,
     sort: 'pop', page: 1, per: 12
   };
@@ -79,18 +80,35 @@ window.PAGE_INIT = function () {
     { v: '500000-99999999', t: 'Trên 500.000đ' }
   ];
 
-  document.getElementById('fCats').innerHTML =
-    '<label><input type="radio" name="fc" value="" ' + (state.cat ? '' : 'checked') + '> Tất cả sản phẩm</label>' +
-    window.CATEGORIES.map(function (c) {
-      return '<label><input type="radio" name="fc" value="' + c.slug + '"' + (state.cat === c.slug ? ' checked' : '') + '> ' + c.icon + ' ' + c.name + '</label>';
+  var catsInScope = window.CATEGORIES.filter(function (c) {
+    return !state.nhom || c.group === state.nhom;
+  });
+  function catRadios(list) {
+    return list.map(function (c) {
+      return '<label><input type="radio" name="fc" value="' + c.slug + '"' +
+        (state.cat === c.slug ? ' checked' : '') + '> ' + c.icon + ' ' + c.name + '</label>';
     }).join('');
+  }
+  document.getElementById('fCats').innerHTML =
+    '<label><input type="radio" name="fc" value="" ' + (state.cat ? '' : 'checked') + '> ' +
+    (state.nhom === 'dungcu' ? 'Tất cả dụng cụ &amp; VPP' : 'Tất cả sản phẩm') + '</label>' +
+    (state.nhom
+      ? catRadios(catsInScope)
+      : '<div class="dd-label" style="padding-left:0">Sách</div>' +
+        catRadios(window.CATEGORIES.filter(function (c) { return c.group === 'sach'; })) +
+        '<div class="dd-label" style="padding-left:0">Dụng cụ &amp; văn phòng phẩm</div>' +
+        catRadios(window.CATEGORIES.filter(function (c) { return c.group === 'dungcu'; })));
   document.getElementById('fPrice').innerHTML = PRICES.map(function (p, i) {
     return '<label><input type="radio" name="fp" value="' + p.v + '"' + (i ? '' : ' checked') + '> ' + p.t + '</label>';
   }).join('');
 
   function bind() {
     document.querySelectorAll('input[name=fc]').forEach(function (r) {
-      r.onchange = function () { state.cat = r.value; state.sub = ''; state.page = 1; render(); };
+      r.onchange = function () {
+        state.cat = r.value;
+        if (r.value && state.nhom && window.catGroup(r.value) !== state.nhom) state.nhom = '';
+        state.sub = ''; state.page = 1; render();
+      };
     });
     document.querySelectorAll('input[name=fp]').forEach(function (r) {
       r.onchange = function () { state.price = r.value; state.page = 1; render(); };
@@ -100,7 +118,9 @@ window.PAGE_INIT = function () {
     document.getElementById('fHot').onchange = function () { state.hot = this.checked; state.page = 1; render(); };
     document.getElementById('fHot').checked = state.hot;
     document.getElementById('sortSel').onchange = function () { state.sort = this.value; state.page = 1; render(); };
-    document.getElementById('fClear').onclick = function () { location.href = 'danh-muc.html'; };
+    document.getElementById('fClear').onclick = function () {
+      location.href = state.nhom ? 'danh-muc.html?nhom=' + state.nhom : 'danh-muc.html';
+    };
     document.getElementById('filterToggle').onclick = function () {
       var sb = document.getElementById('sidebar');
       var open = sb.classList.toggle('open');
@@ -110,6 +130,7 @@ window.PAGE_INIT = function () {
 
   function filtered() {
     var list = window.BOOKS.slice();
+    if (state.nhom) list = list.filter(function (b) { return window.catGroup(b.cat) === state.nhom; });
     if (state.cat) list = list.filter(function (b) { return b.cat === state.cat; });
     if (state.q) list = list.filter(function (b) {
       return (b.title + ' ' + b.author + ' ' + b.publisher).toLowerCase().indexOf(state.q) > -1;
@@ -138,7 +159,10 @@ window.PAGE_INIT = function () {
     var title = state.q ? 'Kết quả tìm kiếm: "' + state.q + '"'
       : state.sub ? state.sub
       : state.cat ? window.catName(state.cat)
-      : state.tag === 'hot' ? 'Khuyến mãi &amp; bán chạy' : 'Tất cả sản phẩm';
+      : state.tag === 'hot' ? 'Khuyến mãi &amp; bán chạy'
+      : state.nhom === 'dungcu' ? 'Dụng cụ học tập &amp; văn phòng phẩm'
+      : state.nhom === 'sach' ? 'Tất cả sách'
+      : 'Tất cả sản phẩm';
     document.getElementById('pageTitle').innerHTML = title;
     document.getElementById('crumbNow').innerHTML = title;
 

@@ -136,7 +136,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .trust b{display:block;font-size:14px} .trust span{font-size:12.5px;color:var(--muted)}
 
 /* ===== Category chips ================================================ */
-.cat-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:10px}
+.cat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
 .cat-chip{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 6px;text-align:center;font-size:12.5px;font-weight:600}
 .cat-chip:hover{transform:translateY(-3px);color:var(--primary)}
 .cat-chip i{display:block;font-size:26px;font-style:normal;margin-bottom:6px}
@@ -287,7 +287,7 @@ button,input,select,textarea{font:inherit;color:inherit}
   .hero{grid-template-columns:200px 1fr}
   .side-promos{display:none}
   .grid{grid-template-columns:repeat(4,1fr)}
-  .cat-grid{grid-template-columns:repeat(5,1fr)}
+  .cat-grid{grid-template-columns:repeat(4,1fr)}
 }
 @media (max-width:900px){
   .header .wrap{flex-wrap:wrap}
@@ -387,3 +387,11 @@ button,input,select,textarea{font:inherit;color:inherit}
   .filter-toggle{display:inline-flex}
   .head-phone{display:none}
 }
+
+/* ===== Menu nhiều nhóm hàng ============================================ */
+.dropdown .dd-label{
+  padding:7px 16px 4px;font-size:11px;font-weight:700;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--muted)
+}
+.dropdown .dd-sub{padding-left:30px;font-size:13px;color:var(--muted)}
+.dropdown .dd-sep{height:1px;background:var(--line);margin:6px 0}

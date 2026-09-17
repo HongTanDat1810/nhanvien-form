@@ -1,7 +1,13 @@
 # Website nhà sách "A" (bản demo)
 
-Website bán sách trực tuyến, nội dung tương tự các trang nhà sách online tại Việt Nam
-(sách trong nước, sách ngoại văn, văn phòng phẩm, quà lưu niệm, tin tức, hệ thống cửa hàng).
+Website bán **sách và dụng cụ học tập** trực tuyến, nội dung tương tự các trang nhà sách
+online tại Việt Nam. Hàng hoá chia làm hai nhóm:
+
+- **Sách** — văn học, kinh tế, tâm lý - kỹ năng sống, thiếu nhi, giáo khoa - tham khảo,
+  ngoại ngữ, sách ngoại văn, lịch sử - địa lý
+- **Dụng cụ & văn phòng phẩm** — dụng cụ học tập (bút, thước, compa, ba lô, máy tính
+  cầm tay, đèn học), dụng cụ mỹ thuật (màu vẽ, cọ, canvas, giá vẽ, đất nặn),
+  văn phòng phẩm và quà lưu niệm
 Toàn bộ là HTML/CSS/JS tĩnh — mở file là chạy, không cần cài đặt.
 
 ## Đổi tên website
@@ -48,7 +54,8 @@ nhasach/
     ├── css/style.css   Toàn bộ giao diện (responsive: desktop / tablet / mobile)
     └── js/
         ├── config.js   ⚙ CẤU HÌNH: tên, liên hệ, màu sắc, chính sách, mã giảm giá
-        ├── data.js     Dữ liệu mẫu: danh mục, ~40 sản phẩm, tin tức, cửa hàng, banner
+        ├── data.js     Dữ liệu mẫu: 12 danh mục (nhóm sách / dụng cụ), 62 sản phẩm,
+        │               tin tức, cửa hàng, banner
         └── app.js      Header/footer dùng chung, tìm kiếm gợi ý, giỏ hàng,
                         yêu thích, mã giảm giá, đánh giá, hộp đổi tên
 ```
@@ -57,6 +64,9 @@ nhasach/
 
 - Tìm kiếm có gợi ý tức thì trên thanh header
 - Lọc + sắp xếp + phân trang danh sách sản phẩm (trên mobile có nút **⚙ Bộ lọc**)
+- Lọc theo nhóm hàng: `danh-muc.html?nhom=dungcu` chỉ hiện dụng cụ & văn phòng phẩm
+- Trang chi tiết tự đổi nhãn theo loại hàng: sách hiện *Tác giả / Nhà xuất bản*,
+  dụng cụ hiện *Thương hiệu / Nhà cung cấp*
 - Giỏ hàng lưu bằng `localStorage` (số lượng, xoá, tính phí giao hàng, đặt hàng)
 - **Mã giảm giá**: `GIAM10`, `SACH50K`, `FREESHIP` — khai báo trong `config.js` (`coupons`)
 - **Danh sách yêu thích**: bấm ♥ trên sản phẩm, xem lại ở trang `yeu-thich.html`

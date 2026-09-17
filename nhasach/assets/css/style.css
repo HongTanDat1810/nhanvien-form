@@ -317,3 +317,73 @@ button,input,select,textarea{font:inherit;color:inherit}
   .cart-table td{display:block;border:none;padding:6px 0}
   .cart-table tr{display:block;border-bottom:1px solid var(--line);padding:10px 0}
 }
+
+/* ===== Nút yêu thích trên thẻ sản phẩm ================================ */
+.wish-btn{
+  position:absolute;top:8px;right:8px;z-index:3;width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--line);background:#fff;color:#c9ced6;font-size:16px;line-height:1;
+  cursor:pointer;transition:.15s;display:grid;place-items:center
+}
+.wish-btn:hover{color:var(--danger);border-color:var(--danger)}
+.wish-btn.on{color:#fff;background:var(--danger);border-color:var(--danger)}
+
+/* ===== Nút mở bộ lọc trên mobile ====================================== */
+.filter-toggle{display:none}
+
+/* ===== Tabs trang chi tiết ============================================ */
+.dtabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin:20px 0 0;flex-wrap:wrap}
+.dtab{
+  padding:10px 16px;border:none;background:none;cursor:pointer;font-weight:600;font-size:14px;
+  color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px
+}
+.dtab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.dpane{display:none;padding-top:16px}
+.dpane.active{display:block}
+
+/* ===== Đánh giá ======================================================= */
+.rv-summary{display:flex;gap:24px;align-items:center;flex-wrap:wrap;background:#fbfbfc;border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:16px}
+.rv-score{text-align:center;min-width:110px}
+.rv-score b{display:block;font-size:34px;line-height:1.1;color:var(--danger)}
+.rv-bars{flex:1;min-width:220px}
+.rv-bar{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:3px 0}
+.rv-bar span:first-child{width:34px;color:var(--muted)}
+.rv-bar i{flex:1;height:7px;background:#eceef2;border-radius:4px;overflow:hidden}
+.rv-bar i b{display:block;height:100%;background:#f5a623}
+.rv-item{border-bottom:1px solid var(--line);padding:13px 0}
+.rv-item:last-child{border-bottom:none}
+.rv-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13.5px}
+.rv-head b{font-size:14px}
+.rv-item p{margin:6px 0 0}
+.star-pick{display:flex;gap:4px;font-size:24px;color:#d8dce2;cursor:pointer;line-height:1}
+.star-pick span{transition:.1s}
+.star-pick span.on{color:#f5a623}
+
+/* ===== Mã giảm giá ==================================================== */
+.coupon-row{display:flex;gap:8px;margin:10px 0}
+.coupon-row input{flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:8px;outline:none;text-transform:uppercase}
+.coupon-ok{background:#e9f7f0;border:1px solid #b7e5cf;color:#046c47;border-radius:8px;padding:9px 12px;font-size:13.5px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.coupon-ok button{border:none;background:none;color:#046c47;cursor:pointer;text-decoration:underline;font-size:13px}
+.coupon-list{font-size:12.5px;color:var(--muted);line-height:1.8}
+.coupon-list code{background:#eef2f7;border-radius:4px;padding:1px 6px;font-weight:700;color:var(--primary);cursor:pointer}
+
+/* ===== Tài khoản / chính sách ========================================= */
+.auth-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.policy-nav a{display:block;padding:9px 12px;border-radius:7px;font-size:13.5px;border-bottom:1px solid #f1f3f6}
+.policy-nav a:last-child{border-bottom:none}
+.policy-nav a:hover{background:#f2f5fa;color:var(--primary)}
+.policy-nav a.active{background:var(--primary);color:#fff}
+.prose h2{font-size:20px;margin:0 0 10px}
+.prose h3{font-size:16px;margin:20px 0 6px}
+.prose p,.prose li{font-size:14.5px}
+.prose ul,.prose ol{padding-left:20px;line-height:1.9}
+.faq-item{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.faq-item summary{padding:12px 14px;cursor:pointer;font-weight:600;font-size:14.5px;list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::before{content:"＋";margin-right:8px;color:var(--primary);font-weight:700}
+.faq-item[open] summary::before{content:"－"}
+.faq-item div{padding:0 14px 13px;font-size:14px;color:#41474f}
+
+@media (max-width:900px){
+  .filter-toggle{display:inline-flex}
+  .head-phone{display:none}
+}

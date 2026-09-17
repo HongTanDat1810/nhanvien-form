@@ -7,6 +7,9 @@
   /* ---------- Cấu hình + phần ghi đè do người dùng đổi trên web ---------- */
   var OVERRIDE_KEY = 'site_config_override';
   var CART_KEY = 'cart_items';
+  var WISH_KEY = 'wish_items';
+  var COUPON_KEY = 'cart_coupon';
+  var REVIEW_KEY = 'user_reviews';
 
   function deepMerge(a, b) {
     var out = JSON.parse(JSON.stringify(a));
@@ -102,8 +105,55 @@
   function paintBadge() {
     var el = document.getElementById('cartBadge');
     if (el) el.textContent = cartCount();
+    var w = document.getElementById('wishBadge');
+    if (w) {
+      var n = getWish().length;
+      w.textContent = n;
+      w.style.display = n ? '' : 'none';
+    }
   }
   window.Cart = { get: getCart, set: setCart, add: addToCart, count: cartCount, subtotal: cartSubtotal };
+
+  /* ---------- Danh sách yêu thích ---------- */
+  function getWish() { try { return JSON.parse(localStorage.getItem(WISH_KEY) || '[]'); } catch (e) { return []; } }
+  function setWish(w) { localStorage.setItem(WISH_KEY, JSON.stringify(w)); paintBadge(); }
+  function inWish(id) { return getWish().indexOf(id) > -1; }
+  function toggleWish(id) {
+    var w = getWish(), i = w.indexOf(id);
+    if (i > -1) { w.splice(i, 1); toast('Đã bỏ khỏi danh sách yêu thích'); }
+    else { w.push(id); toast('Đã thêm vào danh sách yêu thích ♥'); }
+    setWish(w);
+    return i === -1;
+  }
+  window.Wish = { get: getWish, set: setWish, has: inWish, toggle: toggleWish };
+
+  /* ---------- Mã giảm giá ---------- */
+  function findCoupon(code) {
+    var c = String(code || '').trim().toUpperCase();
+    return (CFG.coupons || []).filter(function (x) { return x.code === c; })[0] || null;
+  }
+  function getCoupon() { return findCoupon(localStorage.getItem(COUPON_KEY)); }
+  function setCoupon(code) {
+    if (code) localStorage.setItem(COUPON_KEY, String(code).trim().toUpperCase());
+    else localStorage.removeItem(COUPON_KEY);
+  }
+  function discountOf(coupon, subtotal) {
+    if (!coupon || coupon.type === 'ship' || subtotal < (coupon.min || 0)) return 0;
+    if (coupon.type === 'amount') return Math.min(coupon.value, subtotal);
+    var d = Math.round(subtotal * coupon.value / 100);
+    return coupon.max ? Math.min(d, coupon.max) : d;
+  }
+  window.Coupon = { find: findCoupon, get: getCoupon, set: setCoupon, discount: discountOf };
+
+  /* ---------- Đánh giá của người dùng ---------- */
+  function allReviews() { try { return JSON.parse(localStorage.getItem(REVIEW_KEY) || '{}'); } catch (e) { return {}; } }
+  function reviewsOf(id) { return allReviews()[id] || []; }
+  function addReview(id, r) {
+    var all = allReviews();
+    all[id] = [r].concat(all[id] || []);
+    localStorage.setItem(REVIEW_KEY, JSON.stringify(all));
+  }
+  window.Reviews = { of: reviewsOf, add: addReview };
 
   /* ---------- Toast ---------- */
   var toastEl;
@@ -123,6 +173,8 @@
   }
   function cardHTML(b) {
     return '<div class="card">' +
+      '<button class="wish-btn' + (inWish(b.id) ? ' on' : '') + '" data-wish="' + b.id + '" ' +
+      'title="Thêm vào yêu thích" aria-label="Thêm vào yêu thích">♥</button>' +
       '<a class="card-img" href="san-pham.html?id=' + b.id + '">' + badgeOf(b) +
       '<img class="cover" src="' + cover(b) + '" alt="' + esc(b.title) + '" loading="lazy"></a>' +
       '<div class="card-body">' +
@@ -143,7 +195,14 @@
 
   document.addEventListener('click', function (e) {
     var t = e.target.closest('[data-add]');
-    if (t) { e.preventDefault(); addToCart(t.getAttribute('data-add'), 1); }
+    if (t) { e.preventDefault(); addToCart(t.getAttribute('data-add'), 1); return; }
+    var w = e.target.closest('[data-wish]');
+    if (w) {
+      e.preventDefault();
+      var on = toggleWish(w.getAttribute('data-wish'));
+      w.classList.toggle('on', on);
+      if (document.body.dataset.page === 'wish' && window.PAGE_REFRESH) window.PAGE_REFRESH();
+    }
   });
 
   /* ---------- Header / Nav / Footer ---------- */
@@ -162,7 +221,7 @@
       '<span class="topbar-links">' +
       '<a href="tin-tuc.html">Tin tức &amp; Khuyến mãi</a>' +
       '<a href="lien-he.html">Hệ thống nhà sách</a>' +
-      '<a href="lien-he.html">Tra cứu đơn hàng</a>' +
+      '<a href="tai-khoan.html?tab=tracuu">Tra cứu đơn hàng</a>' +
       '</span></div></div>' +
 
       '<div class="header"><div class="wrap">' +
@@ -173,8 +232,10 @@
       '<input id="q" placeholder="Tìm sách, tác giả, văn phòng phẩm..." value="' + esc(qs('q')) + '">' +
       '<button type="submit">🔍 Tìm</button><div class="suggest hide" id="suggest"></div></form>' +
       '<div class="head-actions">' +
-      '<a class="head-act" href="lien-he.html"><i>📞</i><span><small>Hỗ trợ</small><b>' + esc(CFG.hotline) + '</b></span></a>' +
-      '<a class="head-act" href="lien-he.html"><i>👤</i><span><small>Tài khoản</small><b>Đăng nhập</b></span></a>' +
+      '<a class="head-act head-phone" href="lien-he.html"><i>📞</i><span><small>Hỗ trợ</small><b>' + esc(CFG.hotline) + '</b></span></a>' +
+      '<a class="head-act" href="tai-khoan.html"><i>👤</i><span><small>Tài khoản</small><b>Đăng nhập</b></span></a>' +
+      '<a class="head-act cart-link" href="yeu-thich.html"><i>♥</i><span class="cart-badge" id="wishBadge">0</span>' +
+      '<span><small>Đã thích</small><b>Yêu thích</b></span></a>' +
       '<a class="head-act cart-link" href="gio-hang.html"><i>🛒</i><span class="cart-badge" id="cartBadge">0</span>' +
       '<span><small>Giỏ hàng</small><b>Thanh toán</b></span></a>' +
       '</div></div></div>' +
@@ -207,16 +268,16 @@
       '<li><a href="lien-he.html">Giới thiệu công ty</a></li>' +
       '<li><a href="lien-he.html">Hệ thống nhà sách</a></li>' +
       '<li><a href="tin-tuc.html">Tin tức &amp; sự kiện</a></li>' +
-      '<li><a href="lien-he.html">Tuyển dụng</a></li>' +
+      '<li><a href="tai-khoan.html">Tài khoản của tôi</a></li>' +
       '<li><a href="lien-he.html">Liên hệ</a></li></ul></div>' +
 
       '<div><h4>Hỗ trợ khách hàng</h4><ul>' +
-      '<li><a href="lien-he.html">Hướng dẫn mua hàng</a></li>' +
-      '<li><a href="lien-he.html">Phương thức thanh toán</a></li>' +
-      '<li><a href="lien-he.html">Chính sách giao hàng</a></li>' +
-      '<li><a href="lien-he.html">Chính sách đổi trả</a></li>' +
-      '<li><a href="lien-he.html">Chính sách bảo mật</a></li>' +
-      '<li><a href="lien-he.html">Câu hỏi thường gặp</a></li></ul></div>' +
+      '<li><a href="chinh-sach.html?t=mua-hang">Hướng dẫn mua hàng</a></li>' +
+      '<li><a href="chinh-sach.html?t=thanh-toan">Phương thức thanh toán</a></li>' +
+      '<li><a href="chinh-sach.html?t=giao-hang">Chính sách giao hàng</a></li>' +
+      '<li><a href="chinh-sach.html?t=doi-tra">Chính sách đổi trả</a></li>' +
+      '<li><a href="chinh-sach.html?t=bao-mat">Chính sách bảo mật</a></li>' +
+      '<li><a href="chinh-sach.html?t=faq">Câu hỏi thường gặp</a></li></ul></div>' +
 
       '<div><h4>Đăng ký nhận tin</h4>' +
       '<p>Nhận thông tin sách mới và mã giảm giá mỗi tuần.</p>' +

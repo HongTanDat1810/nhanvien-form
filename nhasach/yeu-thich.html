@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sản phẩm yêu thích — {TEN}</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="wish">
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="crumb"><a href="index.html">Trang chủ</a> / Yêu thích</div>
+  <div class="sec-head">
+    <h2>Sản phẩm yêu thích</h2>
+    <button class="btn btn-ghost btn-sm hide" id="clearWish">Xoá tất cả</button>
+  </div>
+  <div id="wishWrap"></div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+window.PAGE_INIT = window.PAGE_REFRESH = function () {
+  var ids = window.Wish.get().filter(function (id) { return window.bookById(id); });
+  var wrap = document.getElementById('wishWrap');
+  var clear = document.getElementById('clearWish');
+
+  if (!ids.length) {
+    clear.classList.add('hide');
+    wrap.innerHTML = '<div class="empty"><h3>Chưa có sản phẩm yêu thích</h3>' +
+      '<p>Bấm biểu tượng ♥ trên sản phẩm để lưu lại xem sau.</p>' +
+      '<a class="btn" href="danh-muc.html">Khám phá sản phẩm</a></div>';
+    return;
+  }
+
+  clear.classList.remove('hide');
+  clear.onclick = function () {
+    if (confirm('Xoá toàn bộ danh sách yêu thích?')) { window.Wish.set([]); window.PAGE_REFRESH(); }
+  };
+
+  wrap.innerHTML =
+    '<p class="note" style="margin-top:0">' + ids.length + ' sản phẩm đã lưu</p>' +
+    '<div class="grid grid-4">' + ids.map(function (id) {
+      return window.cardHTML(window.bookById(id));
+    }).join('') + '</div>' +
+    '<div style="margin-top:16px"><button class="btn btn-accent" id="addAll">🛒 Thêm tất cả vào giỏ</button></div>';
+
+  document.getElementById('addAll').onclick = function () {
+    ids.forEach(function (id) { window.Cart.add(id, 1); });
+    window.toast('Đã thêm ' + ids.length + ' sản phẩm vào giỏ ✓');
+  };
+};
+</script>
+</body>
+</html>

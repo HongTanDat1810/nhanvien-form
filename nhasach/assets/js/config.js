@@ -42,5 +42,15 @@ window.SITE_CONFIG = {
   /* --- Chính sách bán hàng --- */
   freeShipThreshold: 300000,
   shipFee: 25000,
-  memberDiscountNote: 'Thành viên Thân thiết giảm thêm 5% cho mọi đơn hàng'
+  memberDiscountNote: 'Thành viên Thân thiết giảm thêm 5% cho mọi đơn hàng',
+
+  /* --- Mã giảm giá áp dụng ở trang giỏ hàng ---
+     type: 'percent' (giảm % tổng tiền hàng, có thể đặt max)
+           'amount'  (giảm số tiền cố định)
+           'ship'    (miễn phí giao hàng)                                  */
+  coupons: [
+    { code: 'GIAM10',   type: 'percent', value: 10, max: 100000, min: 0,      label: 'Giảm 10% tổng tiền hàng (tối đa 100.000đ)' },
+    { code: 'SACH50K',  type: 'amount',  value: 50000,           min: 300000, label: 'Giảm 50.000đ cho đơn từ 300.000đ' },
+    { code: 'FREESHIP', type: 'ship',    value: 0,               min: 0,      label: 'Miễn phí giao hàng' }
+  ]
 };

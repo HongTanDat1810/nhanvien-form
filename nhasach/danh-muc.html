@@ -13,7 +13,7 @@
   <div class="crumb"><a href="index.html">Trang chủ</a> / <span id="crumbNow">Danh mục</span></div>
 
   <div class="layout">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="filter">
         <h4>Danh mục</h4>
         <div id="fCats"></div>
@@ -34,6 +34,7 @@
     <section>
       <h1 id="pageTitle" style="font-size:22px;margin:0 0 12px"></h1>
       <div class="toolbar">
+        <button class="btn btn-ghost btn-sm filter-toggle" id="filterToggle">⚙ Bộ lọc</button>
         <span id="countInfo" class="note"></span>
         <label class="note">Sắp xếp:
           <select id="sortSel">
@@ -100,6 +101,11 @@ window.PAGE_INIT = function () {
     document.getElementById('fHot').checked = state.hot;
     document.getElementById('sortSel').onchange = function () { state.sort = this.value; state.page = 1; render(); };
     document.getElementById('fClear').onclick = function () { location.href = 'danh-muc.html'; };
+    document.getElementById('filterToggle').onclick = function () {
+      var sb = document.getElementById('sidebar');
+      var open = sb.classList.toggle('open');
+      this.textContent = open ? '✕ Đóng bộ lọc' : '⚙ Bộ lọc';
+    };
   }
 
   function filtered() {

@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Biểu Đồ Nhân Sự</title>
+<style>
+  :root{
+    color-scheme: light;
+    --plane:#f9f9f7;
+    --surface-1:#fcfcfb;
+    --text-primary:#0b0b0b;
+    --text-secondary:#52514e;
+    --text-muted:#898781;
+    --grid:#e1e0d9;
+    --axis:#c3c2b7;
+    --border:rgba(11,11,11,.10);
+    --series-1:#2a78d6;
+    --critical:#d03b3b;
+    --good:#0ca30c;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --plane:#0d0d0d;
+      --surface-1:#1a1a19;
+      --text-primary:#ffffff;
+      --text-secondary:#c3c2b7;
+      --text-muted:#898781;
+      --grid:#2c2c2a;
+      --axis:#383835;
+      --border:rgba(255,255,255,.10);
+      --series-1:#3987e5;
+      --critical:#d03b3b;
+      --good:#0ca30c;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --plane:#0d0d0d;
+    --surface-1:#1a1a19;
+    --text-primary:#ffffff;
+    --text-secondary:#c3c2b7;
+    --text-muted:#898781;
+    --grid:#2c2c2a;
+    --axis:#383835;
+    --border:rgba(255,255,255,.10);
+    --series-1:#3987e5;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;padding:24px 16px 64px;
+    background:var(--plane);color:var(--text-primary);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:15px;line-height:1.5;
+  }
+  .wrap{max-width:1000px;margin:0 auto;}
+  header{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between;margin-bottom:4px;}
+  h1{font-size:22px;margin:0;font-weight:650;letter-spacing:-.01em;}
+  .sub{color:var(--text-secondary);font-size:13px;margin:0 0 20px;}
+
+  /* ---- data source row ---- */
+  .controls{
+    display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+    padding:12px;margin-bottom:20px;
+    background:var(--surface-1);border:1px solid var(--border);border-radius:10px;
+  }
+  .controls .spacer{flex:1 1 auto;}
+  button,.filebtn{
+    font:inherit;font-size:13px;padding:8px 14px;border-radius:8px;
+    border:1px solid var(--border);background:var(--surface-1);color:var(--text-primary);
+    cursor:pointer;
+  }
+  button.primary{background:var(--series-1);border-color:transparent;color:#fff;}
+  button:hover,.filebtn:hover{opacity:.88;}
+  input[type=file]{display:none;}
+  #status{font-size:13px;color:var(--text-secondary);}
+  #status.error{color:var(--critical);}
+  #status.ok{color:var(--good);}
+
+  /* ---- stat tiles ---- */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
+  .tile{background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .tile .k{font-size:12px;color:var(--text-secondary);margin-bottom:6px;}
+  .tile .v{font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.1;}
+  .tile .n{font-size:12px;color:var(--text-muted);margin-top:4px;}
+
+  /* ---- chart cards ---- */
+  .card{background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:16px 18px 18px;margin-bottom:16px;}
+  .card h2{font-size:15px;margin:0 0 2px;font-weight:600;}
+  .card .cap{font-size:12px;color:var(--text-secondary);margin:0 0 16px;}
+
+  /* horizontal bars */
+  .hbar{display:grid;grid-template-columns:minmax(80px,140px) 1fr auto;gap:10px;align-items:center;margin-bottom:8px;}
+  .hbar .lab{font-size:13px;color:var(--text-secondary);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .hbar .track{height:16px;background:var(--grid);border-radius:4px;overflow:hidden;}
+  .hbar .fill{height:100%;background:var(--series-1);border-radius:0 4px 4px 0;transition:width .3s ease;}
+  .hbar .val{font-size:13px;color:var(--text-primary);font-variant-numeric:tabular-nums;min-width:44px;text-align:right;}
+
+  /* vertical bars */
+  .vchart{display:flex;align-items:flex-end;gap:2px;height:180px;border-bottom:1px solid var(--axis);padding-bottom:0;}
+  .vcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;}
+  .vfill{background:var(--series-1);border-radius:4px 4px 0 0;transition:height .3s ease;}
+  .vaxis{display:flex;gap:2px;margin-top:6px;}
+  .vaxis span{flex:1;text-align:center;font-size:11px;color:var(--text-muted);font-variant-numeric:tabular-nums;}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--grid);white-space:nowrap;}
+  th{color:var(--text-secondary);font-weight:600;}
+  .tablewrap{overflow-x:auto;}
+
+  .empty{color:var(--text-muted);font-size:13px;padding:8px 0;}
+  #tip{
+    position:fixed;pointer-events:none;opacity:0;transition:opacity .12s;
+    background:var(--surface-1);border:1px solid var(--border);border-radius:8px;
+    padding:6px 10px;font-size:12px;color:var(--text-primary);
+    box-shadow:0 4px 14px rgba(0,0,0,.14);z-index:10;
+  }
+  details summary{cursor:pointer;font-size:13px;color:var(--text-secondary);}
+  code{font-size:12px;background:var(--grid);padding:1px 5px;border-radius:4px;}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Biểu Đồ Nhân Sự</h1>
+    <button id="themeBtn" type="button">Giao diện sáng/tối</button>
+  </header>
+  <p class="sub">Trực quan hoá dữ liệu nhân viên đã gửi qua <a href="index.html">form cập nhật</a>.</p>
+
+  <div class="controls">
+    <button id="loadBtn" class="primary" type="button">Tải từ Google Sheet</button>
+    <label class="filebtn" for="csvFile">Chọn file CSV…</label>
+    <input id="csvFile" type="file" accept=".csv,text/csv"/>
+    <span class="spacer"></span>
+    <span id="status">Chưa có dữ liệu.</span>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="card">
+    <h2>Nhân sự theo bộ phận</h2>
+    <p class="cap">Số nhân viên trong mỗi bộ phận, sắp xếp giảm dần.</p>
+    <div id="deptChart"><p class="empty">Hãy tải dữ liệu để xem biểu đồ.</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Sinh nhật theo tháng</h2>
+    <p class="cap">Số nhân viên có sinh nhật trong từng tháng.</p>
+    <div id="monthChart"><p class="empty">Hãy tải dữ liệu để xem biểu đồ.</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Độ đầy đủ của dữ liệu</h2>
+    <p class="cap">Tỉ lệ hồ sơ đã điền từng trường thông tin.</p>
+    <div id="fillChart"><p class="empty">Hãy tải dữ liệu để xem biểu đồ.</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Bảng dữ liệu</h2>
+    <p class="cap">Toàn bộ bản ghi đang được vẽ ở các biểu đồ trên.</p>
+    <div class="tablewrap" id="table"><p class="empty">Hãy tải dữ liệu để xem bảng.</p></div>
+  </div>
+
+  <details>
+    <summary>Nguồn dữ liệu hoạt động thế nào?</summary>
+    <p class="sub" style="margin-top:10px;">
+      Nút <strong>Tải từ Google Sheet</strong> gọi <code>GET .../exec?action=list</code> tới cùng Apps Script mà form đang gửi dữ liệu.
+      Apps Script cần có hàm <code>doGet</code> trả về JSON dạng <code>{ok:true, data:[…]}</code> (hoặc một mảng bản ghi).
+      Nếu chưa có, hãy xuất Google Sheet ra CSV rồi dùng nút <strong>Chọn file CSV</strong> — mọi biểu đồ chạy hoàn toàn trong trình duyệt, không gửi dữ liệu đi đâu.
+    </p>
+  </details>
+
+</div>
+
+<div id="tip" role="status"></div>
+
+<script>
+// Cùng endpoint với form gửi dữ liệu.
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQfzE-pzVjNTQhEF2RxOjIUX4xm4NqSk2-JfOnnHbRJeNndNGvPErjGpwnP8Z0d801Ug/exec";
+
+const FIELDS = [
+  ["HoTen","Họ tên"], ["MaNV","Mã nhân viên"], ["BoPhan","Bộ phận"],
+  ["ChucDanh","Chức danh"], ["DienThoai","Điện thoại"], ["Email","Email"],
+  ["NgaySinh","Ngày sinh"], ["DiaChi","Địa chỉ"]
+];
+
+let rows = [];
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+
+function setStatus(text, kind){
+  const el = $("status");
+  el.textContent = text;
+  el.className = kind || "";
+}
+
+// Bỏ dấu + viết thường, để khớp tên cột tiếng Việt có dấu.
+function norm(s){
+  return String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"")
+    .replace(/đ/gi,"d").toLowerCase().replace(/[^a-z0-9]/g,"");
+}
+
+const HEADER_MAP = {
+  hoten:"HoTen", hovaten:"HoTen", name:"HoTen",
+  manv:"MaNV", manhanvien:"MaNV", id:"MaNV",
+  bophan:"BoPhan", phongban:"BoPhan", department:"BoPhan",
+  chucdanh:"ChucDanh", chucvu:"ChucDanh",
+  dienthoai:"DienThoai", sodienthoai:"DienThoai", phone:"DienThoai",
+  email:"Email", mail:"Email",
+  ngay:"Ngay", ngaysinh:"Ngay", thang:"Thang", nam:"Nam",
+  diachi:"DiaChi", address:"DiaChi",
+  ghichu:"GhiChu", note:"GhiChu"
+};
+
+// CSV có hỗ trợ ô đặt trong dấu ngoặc kép và xuống dòng bên trong ô.
+function parseCSV(text){
+  const out=[]; let row=[], cell="", q=false;
+  text = text.replace(/^﻿/,"");
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){
+      if(c === '"'){ if(text[i+1] === '"'){ cell+='"'; i++; } else q=false; }
+      else cell+=c;
+    } else if(c === '"'){ q=true; }
+    else if(c === ','){ row.push(cell); cell=""; }
+    else if(c === '\n'){ row.push(cell); out.push(row); row=[]; cell=""; }
+    else if(c !== '\r'){ cell+=c; }
+  }
+  if(cell !== "" || row.length){ row.push(cell); out.push(row); }
+  return out.filter(r => r.some(v => String(v).trim() !== ""));
+}
+
+function recordsFromCSV(text){
+  const grid = parseCSV(text);
+  if(grid.length < 2) return [];
+  const heads = grid[0].map(h => HEADER_MAP[norm(h)] || norm(h));
+  return grid.slice(1).map(r => {
+    const o = {};
+    heads.forEach((h,i) => { o[h] = (r[i] ?? "").trim(); });
+    return o;
+  });
+}
+
+function recordsFromJSON(data){
+  const list = Array.isArray(data) ? data : (data && (data.data || data.rows || data.records)) || [];
+  return list.map(r => {
+    const o = {};
+    Object.keys(r || {}).forEach(k => { o[HEADER_MAP[norm(k)] || norm(k)] = r[k] == null ? "" : String(r[k]).trim(); });
+    return o;
+  });
+}
+
+const has = v => String(v || "").trim() !== "";
+const birthMonth = r => {
+  const m = parseInt(r.Thang, 10);
+  return (m >= 1 && m <= 12) ? m : null;
+};
+const fieldFilled = (r, key) => key === "NgaySinh"
+  ? (has(r.Ngay) && has(r.Thang) && has(r.Nam))
+  : has(r[key]);
+
+/* ---------- tooltip ---------- */
+const tip = $("tip");
+function bindTip(el, text){
+  el.addEventListener("mouseenter", () => { tip.textContent = text; tip.style.opacity = 1; });
+  el.addEventListener("mousemove", e => {
+    tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8) + "px";
+    tip.style.top  = (e.clientY - tip.offsetHeight - 10) + "px";
+  });
+  el.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+}
+
+/* ---------- charts ---------- */
+function hbars(container, items, fmt){
+  container.innerHTML = "";
+  if(!items.length){ container.innerHTML = '<p class="empty">Không có dữ liệu.</p>'; return; }
+  const max = Math.max(...items.map(i => i.value), 1);
+  items.forEach(it => {
+    const row = document.createElement("div"); row.className = "hbar";
+    const lab = document.createElement("div"); lab.className = "lab"; lab.textContent = it.label; lab.title = it.label;
+    const track = document.createElement("div"); track.className = "track";
+    const fill = document.createElement("div"); fill.className = "fill";
+    fill.style.width = (it.value / max * 100) + "%";
+    if(it.value > 0) fill.style.minWidth = "2px";
+    track.appendChild(fill);
+    const val = document.createElement("div"); val.className = "val"; val.textContent = fmt(it);
+    row.append(lab, track, val);
+    bindTip(row, it.label + ": " + fmt(it));
+    container.appendChild(row);
+  });
+}
+
+function renderDept(){
+  const counts = {};
+  rows.forEach(r => { const d = has(r.BoPhan) ? r.BoPhan : "(Chưa có)"; counts[d] = (counts[d] || 0) + 1; });
+  const items = Object.entries(counts)
+    .map(([label, value]) => ({label, value}))
+    .sort((a,b) => b.value - a.value);
+  hbars($("deptChart"), items, i => i.value + " người");
+}
+
+function renderMonth(){
+  const counts = Array(12).fill(0);
+  let unknown = 0;
+  rows.forEach(r => { const m = birthMonth(r); if(m) counts[m-1]++; else unknown++; });
+  const box = $("monthChart");
+  box.innerHTML = "";
+  if(!rows.length){ box.innerHTML = '<p class="empty">Không có dữ liệu.</p>'; return; }
+  const max = Math.max(...counts, 1);
+  const chart = document.createElement("div"); chart.className = "vchart";
+  const axis = document.createElement("div"); axis.className = "vaxis";
+  counts.forEach((c, i) => {
+    const col = document.createElement("div"); col.className = "vcol";
+    const fill = document.createElement("div"); fill.className = "vfill";
+    fill.style.height = (c / max * 100) + "%";
+    if(c > 0) fill.style.minHeight = "2px";
+    col.appendChild(fill);
+    bindTip(col, "Tháng " + (i+1) + ": " + c + " người");
+    chart.appendChild(col);
+    const s = document.createElement("span"); s.textContent = "T" + (i+1);
+    axis.appendChild(s);
+  });
+  box.append(chart, axis);
+  if(unknown){
+    const note = document.createElement("p"); note.className = "empty";
+    note.textContent = unknown + " hồ sơ chưa có tháng sinh.";
+    box.appendChild(note);
+  }
+}
+
+function renderFill(){
+  const n = rows.length;
+  const items = FIELDS.map(([key, label]) => ({
+    label,
+    count: rows.filter(r => fieldFilled(r, key)).length,
+    value: n ? rows.filter(r => fieldFilled(r, key)).length / n * 100 : 0
+  })).sort((a,b) => b.value - a.value);
+  hbars($("fillChart"), items, i => Math.round(i.value) + "%");
+}
+
+function renderTiles(){
+  const n = rows.length;
+  const depts = new Set(rows.filter(r => has(r.BoPhan)).map(r => r.BoPhan)).size;
+  const email = rows.filter(r => has(r.Email)).length;
+  const phone = rows.filter(r => has(r.DienThoai)).length;
+  const pct = c => n ? Math.round(c / n * 100) + "%" : "–";
+  $("tiles").innerHTML = [
+    ["Tổng nhân viên", n || "–", n ? "bản ghi" : "chưa tải dữ liệu"],
+    ["Số bộ phận", depts || "–", "có nhân sự"],
+    ["Có email", pct(email), email + "/" + n + " hồ sơ"],
+    ["Có điện thoại", pct(phone), phone + "/" + n + " hồ sơ"]
+  ].map(([k, v, note]) =>
+    `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n ? note : ""}</div></div>`
+  ).join("");
+}
+
+function renderTable(){
+  const box = $("table");
+  if(!rows.length){ box.innerHTML = '<p class="empty">Không có dữ liệu.</p>'; return; }
+  const cols = [["HoTen","Họ tên"],["MaNV","Mã NV"],["BoPhan","Bộ phận"],["ChucDanh","Chức danh"],
+                ["DienThoai","Điện thoại"],["Email","Email"],["NgaySinh","Ngày sinh"],["DiaChi","Địa chỉ"]];
+  const esc = s => String(s ?? "").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  const cell = (r, k) => k === "NgaySinh"
+    ? (fieldFilled(r,"NgaySinh") ? `${r.Ngay}/${r.Thang}/${r.Nam}` : "")
+    : (r[k] || "");
+  box.innerHTML =
+    "<table><thead><tr>" + cols.map(c => `<th>${c[1]}</th>`).join("") + "</tr></thead><tbody>" +
+    rows.map(r => "<tr>" + cols.map(c => `<td>${esc(cell(r, c[0]))}</td>`).join("") + "</tr>").join("") +
+    "</tbody></table>";
+}
+
+function renderAll(){
+  renderTiles(); renderDept(); renderMonth(); renderFill(); renderTable();
+}
+
+/* ---------- data sources ---------- */
+$("loadBtn").addEventListener("click", async () => {
+  setStatus("Đang tải…");
+  try{
+    const res = await fetch(SCRIPT_URL + "?action=list", {method:"GET"});
+    const data = await res.json();
+    if(data && data.ok === false) throw new Error(data.error || "server trả về lỗi");
+    rows = recordsFromJSON(data);
+    if(!rows.length){ setStatus("Endpoint không trả về bản ghi nào.", "error"); }
+    else setStatus("Đã tải " + rows.length + " bản ghi từ Google Sheet.", "ok");
+    renderAll();
+  }catch(err){
+    setStatus("Không tải được từ Apps Script (" + err.message + "). Hãy dùng file CSV.", "error");
+  }
+});
+
+$("csvFile").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      rows = recordsFromCSV(reader.result);
+      if(!rows.length){ setStatus("File CSV không có bản ghi nào.", "error"); }
+      else setStatus("Đã đọc " + rows.length + " bản ghi từ " + file.name + ".", "ok");
+      renderAll();
+    }catch(err){
+      setStatus("Không đọc được file CSV: " + err.message, "error");
+    }
+  };
+  reader.onerror = () => setStatus("Không đọc được file.", "error");
+  reader.readAsText(file, "utf-8");
+});
+
+$("themeBtn").addEventListener("click", () => {
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const cur = document.documentElement.getAttribute("data-theme") || (dark ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+});
+
+renderTiles();
+</script>
+</body>
+</html>
